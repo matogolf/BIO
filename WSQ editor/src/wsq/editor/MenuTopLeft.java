@@ -8,12 +8,20 @@ package wsq.editor;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import org.jnbis.api.Jnbis;
 
 /**
@@ -23,13 +31,27 @@ import org.jnbis.api.Jnbis;
 public class MenuTopLeft extends javax.swing.JFrame {
 
     private static String WSQ_FILE_NAME;
+    private int screenWidth;            //velkost obrazovky uzivatela
+    private int screenHeight;           //velkost obrazovky uzivatela
+    public int xBoundery;               // orezana plocha na zobrazovanie obrazka
+    public int yBoundery;               // orezana plocha na zobrazovanie obrazka
+    private int xBorder = 230;          // o kolko sa oreazava zobrazovacia plocha
+    private int yBorder = 130;          // o kolko sa oreazava zobrazovacia plocha
+    private BufferedImage img = null;   // obrazok ktory sa zobrazuje
+    
+
     /**
      * Creates new form MenuFile
      */
     public MenuTopLeft() {
         initComponents();
-//        JFileChooser chooseFile = new JFileChooser();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        screenWidth = (int) screenSize.getWidth();
+        screenHeight = (int) screenSize.getHeight();
+        xBoundery = this.screenWidth - xBorder;
+        yBoundery = this.screenHeight - yBorder;
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -60,6 +82,7 @@ public class MenuTopLeft extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jMenuItem8 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("WSQ editor");
@@ -83,6 +106,8 @@ public class MenuTopLeft extends javax.swing.JFrame {
             }
         });
 
+        imgViewerLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
         brightnessButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/wsq/imgs/brightness.png"))); // NOI18N
         brightnessButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -100,6 +125,11 @@ public class MenuTopLeft extends javax.swing.JFrame {
         markantButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/wsq/imgs/markant.png"))); // NOI18N
 
         rotateButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/wsq/imgs/rotate.PNG"))); // NOI18N
+        rotateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rotateButtonActionPerformed(evt);
+            }
+        });
 
         cropButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/wsq/imgs/crop.png"))); // NOI18N
 
@@ -134,7 +164,7 @@ public class MenuTopLeft extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem7);
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItem2.setText("Quit");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -178,6 +208,15 @@ public class MenuTopLeft extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItem6);
 
+        jMenuItem8.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem8.setText("Undo");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem8);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -186,7 +225,7 @@ public class MenuTopLeft extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(rotateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(markantButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -200,14 +239,14 @@ public class MenuTopLeft extends javax.swing.JFrame {
                 .addComponent(importImg, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(160, 160, 160))
             .addGroup(layout.createSequentialGroup()
-                .addGap(219, 219, 219)
+                .addGap(120, 120, 120)
                 .addComponent(imgViewerLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(62, Short.MAX_VALUE)
+                .addContainerGap(67, Short.MAX_VALUE)
                 .addComponent(brightnessButton, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(contrastButton, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -225,9 +264,9 @@ public class MenuTopLeft extends javax.swing.JFrame {
                 .addComponent(zoomMinusButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(70, 70, 70))
             .addGroup(layout.createSequentialGroup()
-                .addGap(55, 55, 55)
+                .addGap(28, 28, 28)
                 .addComponent(imgViewerLabel)
-                .addGap(58, 58, 58)
+                .addGap(85, 85, 85)
                 .addComponent(importImg)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -265,20 +304,71 @@ public class MenuTopLeft extends javax.swing.JFrame {
         WSQ_FILE_NAME = filepath;//("/home/ormos/Downloads/a001.wsq");
         byte[] jpgArray;
         jpgArray = Jnbis.wsq().decode(WSQ_FILE_NAME).toJpg().asByteArray();
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(jpgArray);
+        try {
+            img = ImageIO.read(bais);
+            Dimension newImgSize = ImageTools.getScaledDimension(img.getWidth(), img.getHeight(), xBoundery, yBoundery);
+            int x = (int) newImgSize.getWidth();
+            int y = (int) newImgSize.getHeight();
+            img = ImageTools.resize(img, x, y);
+            
+            if (ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getWidth() < 0 ||
+                ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getHeight() < 0) {
+                this.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+            }
+            else {
+                this.setSize(ImageTools.getWindowSize(x, y, xBoundery, yBoundery));
+            }
+                            
+            importImg.hide();
+            imgViewerLabel.setIcon(new javax.swing.ImageIcon(img));                      
+        
+        } catch (IOException ex) {
+            Logger.getLogger(MenuTopLeft.class.getName()).log(Level.SEVERE, null, ex);
+        }
                 
-        importImg.hide();
-        imgViewerLabel.setIcon(new javax.swing.ImageIcon(jpgArray));                
+         
 
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void importImgMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importImgMouseClicked
-        // same as jMenuItem1ActionPerformed
         FileDialog f = new FileDialog(this, "Open WSQ File ", FileDialog.LOAD);
         String directory = null;
         f.setDirectory(directory);       // set the default directory
-        // display the dialog and wait for the user's response
         f.show();
+        directory = f.getDirectory();
         String filepath = directory+f.getFile();
+        // display the dialog and wait for the user's response
+        System.out.println(filepath);    
+
+        WSQ_FILE_NAME = filepath;//("/home/ormos/Downloads/a001.wsq");
+        byte[] jpgArray;
+        jpgArray = Jnbis.wsq().decode(WSQ_FILE_NAME).toJpg().asByteArray();
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(jpgArray);
+        try {
+            img = ImageIO.read(bais);
+            Dimension newImgSize = ImageTools.getScaledDimension(img.getWidth(), img.getHeight(), xBoundery, yBoundery);
+            int x = (int) newImgSize.getWidth();
+            int y = (int) newImgSize.getHeight();
+            img = ImageTools.resize(img, x, y);
+            
+            if (ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getWidth() < 0 ||
+                ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getHeight() < 0) {
+                this.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+            }
+            else {
+                this.setSize(ImageTools.getWindowSize(x, y, xBoundery, yBoundery));
+            }
+                            
+            importImg.hide();
+            imgViewerLabel.setIcon(new javax.swing.ImageIcon(img));                      
+     
+
+        } catch (IOException ex) {
+            Logger.getLogger(MenuTopLeft.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_importImgMouseClicked
 
     private void importImgMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importImgMouseEntered
@@ -304,12 +394,31 @@ public class MenuTopLeft extends javax.swing.JFrame {
         String filepath = directory+f.getFile();
         // display the dialog and wait for the user's response
 
-        BufferedImage img = null;
+        
 
             try {
                 img = ImageIO.read(new File(filepath));
+                Dimension newImgSize = ImageTools.getScaledDimension(img.getWidth(), img.getHeight(), xBoundery, yBoundery);
+                int x = (int) newImgSize.getWidth();
+                int y = (int) newImgSize.getHeight();
+                img = ImageTools.resize(img, x, y); 
+                
+                System.out.println(ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getHeight());
+                
+                
+                if (ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getWidth() < 0 ||
+                    ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getHeight() < 0) {
+                    this.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+                }
+                else {
+                    this.setSize(ImageTools.getWindowSize(x, y, xBoundery, yBoundery));
+                }
+
                 importImg.hide();
                 imgViewerLabel.setIcon(new javax.swing.ImageIcon(img));
+                imgViewerLabel.setHorizontalAlignment(JLabel.CENTER);
+                
+
             }
             catch (IOException e) {
                 System.err.println("I could not load the file \'"+directory+"'.  Sorry.");
@@ -323,6 +432,23 @@ public class MenuTopLeft extends javax.swing.JFrame {
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contrastButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_contrastButtonActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
+
+    private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rotateButtonActionPerformed
+        int w = img.getWidth();  
+        int h = img.getHeight();  
+        BufferedImage newImage = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        Graphics2D g2 = newImage.createGraphics();
+        g2.rotate(Math.toRadians(-90), w/2, h/2);  
+        g2.drawImage(img,null,0,0);
+        img = newImage;
+        
+        
+        imgViewerLabel.setIcon(new javax.swing.ImageIcon(img));
+    }//GEN-LAST:event_rotateButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -378,6 +504,7 @@ public class MenuTopLeft extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JButton markantButton;
     private javax.swing.JButton rotateButton;
     private javax.swing.JButton textButton;
