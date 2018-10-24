@@ -14,6 +14,7 @@ import java.io.IOException;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import org.jnbis.api.Jnbis;
 
 /**
  *
@@ -21,6 +22,7 @@ import javax.swing.JFileChooser;
  */
 public class MenuTopLeft extends javax.swing.JFrame {
 
+    private static String WSQ_FILE_NAME;
     /**
      * Creates new form MenuFile
      */
@@ -251,13 +253,22 @@ public class MenuTopLeft extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // same as importImgMouseClicked
         FileDialog f = new FileDialog(this, "Open WSQ File ", FileDialog.LOAD);
         String directory = null;
         f.setDirectory(directory);       // set the default directory
-        // display the dialog and wait for the user's response
         f.show();
+        directory = f.getDirectory();
         String filepath = directory+f.getFile();
+        // display the dialog and wait for the user's response
+        System.out.println(filepath);    
+
+        WSQ_FILE_NAME = filepath;//("/home/ormos/Downloads/a001.wsq");
+        byte[] jpgArray;
+        jpgArray = Jnbis.wsq().decode(WSQ_FILE_NAME).toJpg().asByteArray();
+                
+        importImg.hide();
+        imgViewerLabel.setIcon(new javax.swing.ImageIcon(jpgArray));                
+
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void importImgMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importImgMouseClicked
@@ -292,7 +303,7 @@ public class MenuTopLeft extends javax.swing.JFrame {
         directory = f.getDirectory();
         String filepath = directory+f.getFile();
         // display the dialog and wait for the user's response
-        
+
         BufferedImage img = null;
 
             try {
