@@ -170,6 +170,10 @@ public class DrawPanel extends JPanel
         myFrame.setSize(size);
         this.paintNow = true;
     }
+
+    void setUndecorated(boolean b) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     /**
      * Private inner class that implements MouseAdapter and does event handling for mouse events.

@@ -20,7 +20,9 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -28,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import org.jnbis.api.Jnbis;
 
 
@@ -114,7 +117,7 @@ public class DrawFrame extends JFrame
      */
     public DrawFrame()
     {
-        super("SuperPaint Application v2.0!"); //sets the name of DrawFrame
+        super("Brutal BIO WSQ Editor v2.0.1!"); //sets the name of DrawFrame
         
         JLabel statusLabel = new JLabel( "" ); //create JLabel object to pass into DrawPanel
         
@@ -183,8 +186,13 @@ public class DrawFrame extends JFrame
 //        widgetJPanel.setLayout( new GridLayout( 8, 3 ) ); //sets padding between widgets in gridlayout
       widgetJPanel.setLayout( new GridLayout( 6, 1, 0, 5 ) ); //sets padding between widgets in gridlayout
         
+      
+        /**
+         * First File menu
+         */
         JMenuBar menubar = new JMenuBar();
         JMenu menu1 = new JMenu("File");
+        
         JMenuItem importWsq = new JMenuItem("Import WSQ file...");
         importWsq.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
         importWsq.addActionListener(new java.awt.event.ActionListener() {
@@ -212,7 +220,37 @@ public class DrawFrame extends JFrame
         });
         menu1.add(quit);
         
-        JMenu menu2 = new JMenu("Edit");
+        /**
+         * Second Tools menu
+         */
+        JMenu menu2 = new JMenu("Tools");
+        
+        JMenu menu3 = new JMenu("Convert WSQ to other formats...");
+        JMenuItem ConvertWSQtoOther = new JMenuItem("Convert WSQ to other formats...");
+        ConvertWSQtoOther.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
+        menu2.add(menu3); 
+        
+        JMenuItem ImporttoFBI = new JMenuItem("Import to FBI Database...");
+        ImporttoFBI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        ImporttoFBI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ImporttoFBIPerformed(evt);
+            }
+        });
+        menu2.add(ImporttoFBI);
+    
+        JMenuItem CallThePolice = new JMenuItem("Call the police...");
+        CallThePolice.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        CallThePolice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CallThePolicePerformed(evt);
+            }
+        });
+        menu2.add(CallThePolice);        
+        
+        /**
+         * Second Tools sub menu
+         */        
         JMenuItem ConvertWSQtoJPG = new JMenuItem("Convert WSQ to JPG...");
         ConvertWSQtoJPG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoJPG.addActionListener(new java.awt.event.ActionListener() {
@@ -220,16 +258,16 @@ public class DrawFrame extends JFrame
                 ConvertWSQtoJPGPerformed(evt);
             }
         });
-        menu2.add(ConvertWSQtoJPG); 
+        menu3.add(ConvertWSQtoJPG); 
         
-        JMenuItem ConvertWSQtoBMP = new JMenuItem("Convert WSQ to BMP...");
-        ConvertWSQtoBMP.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
-        ConvertWSQtoBMP.addActionListener(new java.awt.event.ActionListener() {
+        JMenuItem ConvertWSQtoGIF = new JMenuItem("Convert WSQ to GIF...");
+        ConvertWSQtoGIF.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        ConvertWSQtoGIF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ConvertWSQtoBMPPerformed(evt);
+                ConvertWSQtoGIFPerformed(evt);
             }
         });
-        menu2.add(ConvertWSQtoBMP);
+        menu3.add(ConvertWSQtoGIF);
     
         JMenuItem ConvertWSQtoPNG = new JMenuItem("Convert WSQ to PNG...");
         ConvertWSQtoPNG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
@@ -238,7 +276,7 @@ public class DrawFrame extends JFrame
                 ConvertWSQtoPNGPerformed(evt);
             }
         });
-        menu2.add(ConvertWSQtoPNG);    
+        menu3.add(ConvertWSQtoPNG);    
         
         
         menubar.add(menu1);
@@ -389,20 +427,23 @@ public class DrawFrame extends JFrame
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    private void ConvertWSQtoJPGPerformed(ActionEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    private void ConvertWSQtoBMPPerformed(ActionEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    private void ConvertWSQtoPNGPerformed(ActionEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void ImporttoFBIPerformed(ActionEvent evt) {
+        //custom title, warning icon
+        JOptionPane.showMessageDialog(panel,
+            "Thank you for you tip. Please stay where you are. We will visit you shortly",
+            "FBI warning",
+            JOptionPane.WARNING_MESSAGE);
     }
 
+    private void CallThePolicePerformed(ActionEvent evt) {
+        //custom title, warning icon
+        JOptionPane.showMessageDialog(panel,
+            "As soon as we finish our donuts we will be there",
+            "Inane error",
+            JOptionPane.ERROR_MESSAGE);
+    }    
     
-    
+   
     /**
      * private inner class for button event handling
      */
@@ -458,17 +499,15 @@ public class DrawFrame extends JFrame
         } // end method itemStateChanged
     }
     
-        private void importWsqActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void importWsqActionPerformed(java.awt.event.ActionEvent evt) {                                           
         FileDialog f = new FileDialog(this, "Open WSQ File ", FileDialog.LOAD);
         String directory = null;
         f.setDirectory(directory);       // set the default directory
         f.show();
         directory = f.getDirectory();
         String filepath = directory+f.getFile();
-        // display the dialog and wait for the user's response
-        System.out.println(filepath);    
 
-        WSQ_FILE_NAME = filepath;//("/home/ormos/Downloads/a001.wsq");
+        WSQ_FILE_NAME = filepath;
         byte[] jpgArray;
         jpgArray = Jnbis.wsq().decode(WSQ_FILE_NAME).toJpg().asByteArray();
         
@@ -480,18 +519,6 @@ public class DrawFrame extends JFrame
             int y = (int) newImgSize.getHeight();
             img = ImageTools.resize(img, x, y);
             
-            /*if (ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getWidth() < 0 ||
-                ImageTools.getWindowSize(x, y, xBoundery, yBoundery).getHeight() < 0) {
-                this.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-            }
-            else {
-                this.setSize(ImageTools.getWindowSize(x, y, xBoundery, yBoundery));
-            }*/
-            
-            //this.setSize( 700,700 );
-                            
-            //imgViewerLabel.setIcon(new javax.swing.ImageIcon(img)); 
-            //panel.printImage(img);
             panel.importImage(new javax.swing.ImageIcon(img).getImage());            
             validate();
             repaint();
@@ -501,5 +528,59 @@ public class DrawFrame extends JFrame
         }
         
     }
+    
+    private void ConvertWSQtoPNGPerformed(ActionEvent evt) {
+        FileDialog f = new FileDialog(this, "Choose WSQ File ", FileDialog.LOAD);
+        String directory = null;
+        f.setDirectory(directory);
+        f.show();
+        directory = f.getDirectory();
+        String filepath = directory+f.getFile();
+
+        WSQ_FILE_NAME = filepath;
+
+        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".png";
+        
+        File png = Jnbis.wsq()
+                .decode(WSQ_FILE_NAME)
+                .toPng()
+                .asFile(newFilePath);             
+    }    
+    
+    private void ConvertWSQtoJPGPerformed(ActionEvent evt) {
+        FileDialog f = new FileDialog(this, "Choose WSQ File ", FileDialog.LOAD);
+        String directory = null;
+        f.setDirectory(directory);
+        f.show();
+        directory = f.getDirectory();
+        String filepath = directory+f.getFile();
+
+        WSQ_FILE_NAME = filepath;
+
+        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".jpg   ";
+        
+        File jpg = Jnbis.wsq()
+                .decode(WSQ_FILE_NAME)
+                .toJpg()
+                .asFile(newFilePath);             
+    } 
+
+    private void ConvertWSQtoGIFPerformed(ActionEvent evt) {
+        FileDialog f = new FileDialog(this, "Choose WSQ File ", FileDialog.LOAD);
+        String directory = null;
+        f.setDirectory(directory);
+        f.show();
+        directory = f.getDirectory();
+        String filepath = directory+f.getFile();
+
+        WSQ_FILE_NAME = filepath;
+
+        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".gif";
+        
+        File gif = Jnbis.wsq()
+                .decode(WSQ_FILE_NAME)
+                .toGif()
+                .asFile(newFilePath);             
+    }     
     
 } // end class DrawFrame
