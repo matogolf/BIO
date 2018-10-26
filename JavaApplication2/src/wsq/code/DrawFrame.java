@@ -83,6 +83,28 @@ public class DrawFrame extends JFrame
     private JPanel widgetJPanel; //holds the widgets: buttons, comboboxes and checkbox
     private JPanel widgetPadder; //encapsulates widgetJPanel and adds padding around the edges 
     
+    private JButton brightnessButton;
+    private javax.swing.JButton contrastButton;
+    private javax.swing.JButton cropButton;
+    public javax.swing.JLabel imgViewerLabel;
+    private javax.swing.JLabel importImg;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
+    private javax.swing.JButton markantButton;
+    private javax.swing.JButton rotateButton;
+    private javax.swing.JButton textButton;
+    private javax.swing.JButton zoomMinusButton;
+    private javax.swing.JButton zoomPlusButton;
+    
     /**
      * This constructor sets the name of the JFrame.
      * It also creates a DrawPanel object that extends JPanel for drawing the shapes and contains
@@ -95,6 +117,7 @@ public class DrawFrame extends JFrame
         super("SuperPaint Application v2.0!"); //sets the name of DrawFrame
         
         JLabel statusLabel = new JLabel( "" ); //create JLabel object to pass into DrawPanel
+        
             
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenWidth = (int) screenSize.getWidth();
@@ -105,16 +128,47 @@ public class DrawFrame extends JFrame
         panel = new DrawPanel(statusLabel, this); //create draw panel and pass in JLabel
         
         //create buttons
-        undo = new JButton();
+        undo = new JButton( "Undo" );
         redo = new JButton( "Redo" );
         clear = new JButton( "Clear" );
         
+        importImg = new javax.swing.JLabel();
+        brightnessButton = new JButton();
+        contrastButton = new JButton();
+        markantButton = new JButton();
+        rotateButton = new JButton();
+        cropButton = new JButton();
+        textButton = new JButton();
+        zoomPlusButton = new JButton();
+        zoomMinusButton = new JButton();
+
         undo.setBorderPainted(false);
-        undo.setBorder(null);
-        //button.setFocusable(false);
-        undo.setMargin(new Insets(0, 0, 0, 0));
-        undo.setContentAreaFilled(false);
-        undo.setIcon(new ImageIcon(getClass().getResource("crop.png")));
+        redo.setBorderPainted(false);
+        clear.setBorderPainted(false);
+        brightnessButton.setBorderPainted(false);
+        contrastButton.setBorderPainted(false);
+        markantButton.setBorderPainted(false);
+        rotateButton.setBorderPainted(false);
+        cropButton.setBorderPainted(false);
+        textButton.setBorderPainted(false);
+        zoomPlusButton.setBorderPainted(false);
+        zoomMinusButton.setBorderPainted(false);
+                
+        undo.setFocusable(false);
+        redo.setFocusable(false);
+        clear.setFocusable(false);
+        brightnessButton.setFocusable(false);
+        contrastButton.setFocusable(false);
+        markantButton.setFocusable(false);
+        rotateButton.setFocusable(false);
+        cropButton.setFocusable(false);
+        textButton.setFocusable(false);
+        zoomPlusButton.setFocusable(false);
+        zoomMinusButton.setFocusable(false);
+        
+        
+//        undo.setMargin(new Insets(0, 0, 0, 0));
+//        undo.setContentAreaFilled(false);
         //undo.setPreferredSize(new Dimension(40, 40));
         
         //create comboboxes
@@ -126,18 +180,69 @@ public class DrawFrame extends JFrame
         
         //JPanel object, widgetJPanel, with grid layout for widgets
         widgetJPanel = new JPanel();
-        widgetJPanel.setLayout( new GridLayout( 6, 1, 0, 5 ) ); //sets padding between widgets in gridlayout
+//        widgetJPanel.setLayout( new GridLayout( 8, 3 ) ); //sets padding between widgets in gridlayout
+      widgetJPanel.setLayout( new GridLayout( 6, 1, 0, 5 ) ); //sets padding between widgets in gridlayout
         
         JMenuBar menubar = new JMenuBar();
-        JMenu menu = new JMenu("Veci");
-        JMenuItem importWsq = new JMenuItem("import wsq file");
+        JMenu menu1 = new JMenu("File");
+        JMenuItem importWsq = new JMenuItem("Import WSQ file...");
+        importWsq.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
         importWsq.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importWsqActionPerformed(evt);
             }
         });
-        menu.add(importWsq);
-        menubar.add(menu);
+        menu1.add(importWsq);
+        
+        JMenuItem importBitmap = new JMenuItem("Import Bitmap file...");
+        importBitmap.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        importBitmap.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importBitmapActionPerformed(evt);
+            }
+        });
+        menu1.add(importBitmap);
+        
+        JMenuItem quit = new JMenuItem("Quit");
+        quit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        quit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quitPerformed(evt);
+            }
+        });
+        menu1.add(quit);
+        
+        JMenu menu2 = new JMenu("Edit");
+        JMenuItem ConvertWSQtoJPG = new JMenuItem("Convert WSQ to JPG...");
+        ConvertWSQtoJPG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
+        ConvertWSQtoJPG.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConvertWSQtoJPGPerformed(evt);
+            }
+        });
+        menu2.add(ConvertWSQtoJPG); 
+        
+        JMenuItem ConvertWSQtoBMP = new JMenuItem("Convert WSQ to BMP...");
+        ConvertWSQtoBMP.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        ConvertWSQtoBMP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConvertWSQtoBMPPerformed(evt);
+            }
+        });
+        menu2.add(ConvertWSQtoBMP);
+    
+        JMenuItem ConvertWSQtoPNG = new JMenuItem("Convert WSQ to PNG...");
+        ConvertWSQtoPNG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        ConvertWSQtoPNG.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConvertWSQtoPNGPerformed(evt);
+            }
+        });
+        menu2.add(ConvertWSQtoPNG);    
+        
+        
+        menubar.add(menu1);
+        menubar.add(menu2);
         this.setJMenuBar(menubar);
         
         //JPanel object, widgetPadder, with flowlayout to encapsulate and pad the widgetJPanel
@@ -148,6 +253,16 @@ public class DrawFrame extends JFrame
         widgetJPanel.add( undo );
         widgetJPanel.add( redo );
         widgetJPanel.add( clear );
+        widgetJPanel.add( brightnessButton );
+        widgetJPanel.add( contrastButton );
+        widgetJPanel.add( markantButton );
+        widgetJPanel.add( rotateButton );
+        widgetJPanel.add( cropButton );
+        widgetJPanel.add( textButton );
+        widgetJPanel.add( zoomPlusButton );
+        widgetJPanel.add( zoomMinusButton );
+        
+
         //widgetJPanel.add( colors );
         //widgetJPanel.add( shapes );                 
         //widgetJPanel.add( filled );
@@ -170,11 +285,123 @@ public class DrawFrame extends JFrame
         shapes.addItemListener( handler );
         filled.addItemListener( handler );
         
+        
+        brightnessButton.setIcon(new ImageIcon(getClass().getResource("/resources/brightness.png")));
+        brightnessButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                brightnessButtonActionPerformed(evt);
+            }
+        });
+        
+        contrastButton.setIcon(new ImageIcon(getClass().getResource("/resources/contrast.png")));
+        contrastButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contrastButtonActionPerformed(evt);
+            }
+        });
+        
+        markantButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
+        markantButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                markantButtonActionPerformed(evt);
+            }
+        });
+        
+        rotateButton.setIcon(new ImageIcon(getClass().getResource("/resources/rotate.PNG")));
+        rotateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rotateButtonActionPerformed(evt);
+            }
+        });
+        
+        cropButton.setIcon(new ImageIcon(getClass().getResource("/resources/crop.png")));
+        cropButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cropButtonActionPerformed(evt);
+            }
+        });
+        
+        textButton.setIcon(new ImageIcon(getClass().getResource("/resources/text.png")));
+        textButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textButtonActionPerformed(evt);
+            }
+        });
+        
+        zoomPlusButton.setIcon(new ImageIcon(getClass().getResource("/resources/zoomPlus.PNG")));
+        zoomPlusButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomPlusButtonActionPerformed(evt);
+            }
+        });
+        
+        zoomMinusButton.setIcon(new ImageIcon(getClass().getResource("/resources/zoomMinus.PNG")));
+        zoomMinusButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomMinusButtonActionPerformed(evt);
+            }
+        });
+        
+
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        setSize( 500, 500 );
+        setSize( 700, 500 );
         setVisible( true );
         
     } // end DrawFrame constructor
+    
+    private void brightnessButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }      
+    
+    private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }  
+    
+    private void markantButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }
+    
+    private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }  
+    
+    private void cropButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }
+    
+    private void textButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }
+    
+    private void zoomPlusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }
+    
+    private void zoomMinusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        // TODO add your handling code here:
+    }
+    
+    private void importBitmapActionPerformed(ActionEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private void quitPerformed(ActionEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private void ConvertWSQtoJPGPerformed(ActionEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private void ConvertWSQtoBMPPerformed(ActionEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private void ConvertWSQtoPNGPerformed(ActionEvent evt) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
     
     /**
      * private inner class for button event handling
