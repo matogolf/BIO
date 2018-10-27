@@ -84,5 +84,45 @@ public class ImageTools {
         return new Dimension(x, y);
     }
     
+    
+    public static BufferedImage changeBrightness(BufferedImage picture1, int factor) {
+        BufferedImage picture2 = new BufferedImage(picture1.getWidth(), picture1.getHeight(),BufferedImage.TYPE_INT_RGB);      
+        
+        int width  = picture1.getWidth();
+        int height = picture1.getHeight();
+
+        for (int y = 0; y < height ; y++) {//loops for image matrix
+            for (int x = 0; x < width ; x++) {
+
+            Color c=new Color(picture1.getRGB(x,y));
+
+            //adding factor to rgb values
+            int r=c.getRed()+factor;
+            int b=c.getBlue()+factor;
+            int g=c.getGreen()+factor;
+            if (r >= 256) {
+                r = 255;
+            } else if (r < 0) {
+                r = 0;
+            }
+
+            if (g >= 256) {
+                g = 255;
+            } else if (g < 0) {
+                g = 0;
+            }
+
+            if (b >= 256) {
+                b = 255;
+            } else if (b < 0) {
+                b = 0;
+            }
+        
+            picture2.setRGB(x, y,new Color(r,g,b).getRGB());
+       
+            }
+        }
+    return picture2;
+    }
 
 }

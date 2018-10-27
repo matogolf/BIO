@@ -65,7 +65,7 @@ public class DrawPanel extends JPanel
         this.statusLabel = statusLabel; //Initialize statusLabel
         
         setLayout(new BorderLayout()); //sets layout to border layout; default is flow layout
-        setBackground( Color.WHITE ); //sets background color of panel to white
+        setBackground( Color.LIGHT_GRAY ); //sets background color of panel to white
         add( statusLabel, BorderLayout.SOUTH );  //adds a statuslabel to the south border
         
         // event handling for mouse and mouse motion events

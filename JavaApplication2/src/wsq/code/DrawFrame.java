@@ -31,6 +31,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JSlider;
 import org.jnbis.api.Jnbis;
 
 
@@ -148,7 +149,8 @@ public class DrawFrame extends JFrame
         undo.setBorderPainted(false);
         redo.setBorderPainted(false);
         clear.setBorderPainted(false);
-        brightnessButton.setBorderPainted(false);
+        brightnessButton.setBorderPainted(false);        brightnessButton.setBounds(100, 100, 100, 80);
+
         contrastButton.setBorderPainted(false);
         markantButton.setBorderPainted(false);
         rotateButton.setBorderPainted(false);
@@ -183,8 +185,8 @@ public class DrawFrame extends JFrame
         
         //JPanel object, widgetJPanel, with grid layout for widgets
         widgetJPanel = new JPanel();
-//        widgetJPanel.setLayout( new GridLayout( 8, 3 ) ); //sets padding between widgets in gridlayout
-      widgetJPanel.setLayout( new GridLayout( 6, 1, 0, 5 ) ); //sets padding between widgets in gridlayout
+        widgetJPanel.setLayout( new GridLayout( 12, 1 ) ); //sets padding between widgets in gridlayout
+//      widgetJPanel.setLayout( new GridLayout( 6, 1, 0, 5 ) ); //sets padding between widgets in gridlayout
         
       
         /**
@@ -382,13 +384,21 @@ public class DrawFrame extends JFrame
         
 
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        setSize( 700, 500 );
+        setSize( 700, 610 );
         setVisible( true );
         
     } // end DrawFrame constructor
     
-    private void brightnessButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+    private void brightnessButtonActionPerformed(java.awt.event.ActionEvent evt) { 
+//        JSlider slider = new JSlider(JSlider.HORIZONTAL);
+//        slider.setSize(50,50);
+//        
+//        widgetJPanel.add(slider);
+        
+        img = ImageTools.changeBrightness(img, 20);
+        panel.importImage(new ImageIcon(img).getImage());            
+        validate();
+        repaint();
     }      
     
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
@@ -420,11 +430,31 @@ public class DrawFrame extends JFrame
     }
     
     private void importBitmapActionPerformed(ActionEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        FileDialog f = new FileDialog(this, "Open bitmap File ", FileDialog.LOAD);
+        String directory = null;
+        f.setDirectory(directory);       // set the default directory
+        f.show();
+        directory = f.getDirectory();
+        String filepath = directory+f.getFile();
+        
+        try {
+            img = ImageIO.read(new File(filepath));
+            Dimension newImgSize = ImageTools.getScaledDimension(img.getWidth(), img.getHeight(), xBoundery, yBoundery);
+            
+            int x = (int) newImgSize.getWidth();
+            int y = (int) newImgSize.getHeight();
+            
+            img = ImageTools.resize(img, x, y);
+            panel.importImage(new javax.swing.ImageIcon(img).getImage());            
+            validate();
+            repaint();
+        } catch (IOException ex) {
+            Logger.getLogger(DrawFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void quitPerformed(ActionEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.exit(0);
     }
     
     private void ImporttoFBIPerformed(ActionEvent evt) {
