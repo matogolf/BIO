@@ -11,14 +11,19 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import javax.imageio.ImageIO;
 import sun.net.www.content.audio.x_aiff;
 
 /**
  *
  * @author matogolf
  */
+
+
 public class ImageTools {
     
     
@@ -90,12 +95,13 @@ public class ImageTools {
         
         int width  = picture1.getWidth();
         int height = picture1.getHeight();
+        factor = 255 * factor/100;
 
         for (int y = 0; y < height ; y++) {//loops for image matrix
             for (int x = 0; x < width ; x++) {
 
             Color c=new Color(picture1.getRGB(x,y));
-
+            
             //adding factor to rgb values
             int r=c.getRed()+factor;
             int b=c.getBlue()+factor;
@@ -125,4 +131,31 @@ public class ImageTools {
     return picture2;
     }
 
+    static BufferedImage changeContrast(BufferedImage img, int value) {
+        return img;
+    }
+
+    
+    static BufferedImage rotate(BufferedImage img)
+    {
+        int         width  = img.getWidth();
+        int         height = img.getHeight();
+        BufferedImage   newImage = new BufferedImage( height, width, img.getType() );
+ 
+        for( int i=0 ; i < width ; i++ )
+            for( int j=0 ; j < height ; j++ )
+                newImage.setRGB( height-1-j, i, img.getRGB(i,j) );
+ 
+            return newImage;
+    }
+
+    static BufferedImage maximumDispaly(BufferedImage img) {
+            Dimension newImgSize = getScaledDimension(img.getWidth(), img.getHeight(), 230, 130);
+            
+            int x = (int) newImgSize.getWidth();
+            int y = (int) newImgSize.getHeight();
+            
+            img = ImageTools.resize(img, x, y);
+            return img;
+    }
 }
