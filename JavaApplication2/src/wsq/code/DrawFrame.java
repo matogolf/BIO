@@ -72,6 +72,7 @@ public class DrawFrame extends JFrame
     
     private BufferedImage img = null;   // obrazok ktory sa zobrazuje
     private BufferedImage upImg = null; // updateovany obrazok ktory sa zobrazuje pri live nahlaade
+    private BufferedImage defaultImg = null; // pre clear button - povodny obrazok
 
     
     private JComboBox colors; //combobox with color options
@@ -99,6 +100,7 @@ public class DrawFrame extends JFrame
     private JPanel widgetPadder; //encapsulates widgetJPanel and adds padding around the edges 
     
     private JButton brightnessButton;
+    private JButton brightnessButtonOK;
     private javax.swing.JButton contrastButton;
     private javax.swing.JButton cropButton;
     public javax.swing.JLabel imgViewerLabel;
@@ -152,6 +154,7 @@ public class DrawFrame extends JFrame
         
         importImg = new javax.swing.JLabel();
         brightnessButton = new JButton();
+        brightnessButtonOK = new JButton("Apply");
         contrastButton = new JButton();
         markantButton = new JButton();
         rotateButton = new JButton();
@@ -321,10 +324,9 @@ public class DrawFrame extends JFrame
         widgetJPanel.add( zoomPlusButton );
         widgetJPanel.add( zoomMinusButton );
         
-        widgetJPanel.add ( brightnessSliderText );
-        
-        
+        widgetJPanel.add ( brightnessSliderText );       
         widgetJPanel.add( brightnessSlider );
+        widgetJPanel.add( brightnessButtonOK );
         brightnessSlider.setSize(1000000, 10);
         brightnessSlider.setPaintTrack(true); 
         brightnessSlider.setPaintTicks(true); 
@@ -341,8 +343,10 @@ public class DrawFrame extends JFrame
         
         brightnessSlider.show(false);
         brightnessSliderText.show(false);
+        brightnessButtonOK.show(false);
         
         brightnessSlider.addChangeListener(e -> brightnessSliderChanged() );
+        
         
 
 //        slider.show(false);
@@ -374,6 +378,11 @@ public class DrawFrame extends JFrame
         brightnessButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 brightnessButtonActionPerformed(evt);
+            }
+        });
+        brightnessButtonOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                brightnessButtonOKActionPerformed(evt);
             }
         });
         
@@ -435,6 +444,7 @@ public class DrawFrame extends JFrame
        
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         setSize( 700, 800 );
+        setMinimumSize(new Dimension(700, 800));
         setVisible( true );
         
     } // end DrawFrame constructor
@@ -460,19 +470,31 @@ public class DrawFrame extends JFrame
 
            if (!brightnessSlider.isShowing()) {
             brightnessSlider.setVisible(true);
-            brightnessSliderText.setVisible(true);  
+            brightnessSliderText.setVisible(true);
+            brightnessButtonOK.setVisible(true);              
             brightnessOn = true;
           }
           else { 
             brightnessSlider.setVisible(false);
-            brightnessSliderText.setVisible(false);   
+            brightnessSliderText.setVisible(false);
+            brightnessButtonOK.setVisible(false);  
+            brightnessSlider.setValue(0);
             brightnessOn = false;
-            img = upImg;
+            panel.importImage(new ImageIcon(img).getImage());            
+            validate();
+            repaint();
             
           }
-    }      
+    }     
+    private void brightnessButtonOKActionPerformed(java.awt.event.ActionEvent evt) { 
+        brightnessSlider.setVisible(false);
+        brightnessSliderText.setVisible(false);
+        brightnessButtonOK.setVisible(false);     
+        brightnessOn = false;
+        brightnessSlider.setValue(0);
+        img = upImg;
+    }
     
-    RescaleOp rescale;
     
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {   
         
@@ -536,6 +558,7 @@ public class DrawFrame extends JFrame
         
         try {
             img = ImageIO.read(new File(filepath));
+            defaultImg = img;
             Dimension newImgSize = ImageTools.getScaledDimension(img.getWidth(), img.getHeight(), xBoundery, yBoundery);
             
             int x = (int) newImgSize.getWidth();
@@ -586,8 +609,16 @@ public class DrawFrame extends JFrame
             else if (event.getActionCommand().equals("Redo")){
                 panel.redoLastShape();
             }
+            // clear button - reset img
             else if (event.getActionCommand().equals("Clear")){
-                panel.clearDrawing();
+//                panel.clearDrawing();
+                Dimension newImgSize = ImageTools.getScaledDimension(defaultImg.getWidth(), defaultImg.getHeight(), xBoundery, yBoundery);
+                int x = (int) newImgSize.getWidth();
+                int y = (int) newImgSize.getHeight();
+                defaultImg = ImageTools.resize(defaultImg, x, y);
+                panel.importImage(new javax.swing.ImageIcon(defaultImg).getImage());            
+                validate();
+                repaint();
             }
              
         } // end method actionPerformed
@@ -642,6 +673,7 @@ public class DrawFrame extends JFrame
         ByteArrayInputStream bais = new ByteArrayInputStream(jpgArray);
         try {
             img = ImageIO.read(bais);
+            defaultImg = img;
             Dimension newImgSize = ImageTools.getScaledDimension(img.getWidth(), img.getHeight(), xBoundery, yBoundery);
             int x = (int) newImgSize.getWidth();
             int y = (int) newImgSize.getHeight();
