@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
@@ -41,6 +42,9 @@ public class DrawPanel extends JPanel
     private DrawFrame myFrame;
     private Image img;
     private boolean paintNow = false;
+    private int oldX, oldY, nowX, nowY;
+    private int imageHeight = 0, imageWidth = 0;
+    
     
     JLabel statusLabel; //status label for mouse coordinates
     
@@ -57,7 +61,7 @@ public class DrawPanel extends JPanel
         clearedShapes = new LinkedList<MyShape>(); //initialize clearedShapes dynamic stack
         
         //Initialize current Shape variables
-        currentShapeType=0;
+        currentShapeType=-1;
         currentShapeObject=null;
         currentShapeColor=Color.BLACK;
         currentShapeFilled=false;
@@ -65,7 +69,7 @@ public class DrawPanel extends JPanel
         this.statusLabel = statusLabel; //Initialize statusLabel
         
         setLayout(new BorderLayout()); //sets layout to border layout; default is flow layout
-        setBackground( Color.LIGHT_GRAY ); //sets background color of panel to white
+        setBackground( Color.WHITE ); //sets background color of panel to white
         add( statusLabel, BorderLayout.SOUTH );  //adds a statuslabel to the south border
         
         // event handling for mouse and mouse motion events
@@ -81,6 +85,7 @@ public class DrawPanel extends JPanel
     public void paintComponent( Graphics g )
     {
         super.paintComponent( g );
+        Graphics2D g2 = (Graphics2D) g;
         
 
         g.drawImage(img, 0, 0, null); 
@@ -89,11 +94,11 @@ public class DrawPanel extends JPanel
         // draw the shapes
         ArrayList<MyShape> shapeArray=myShapes.getArray();
         for ( int counter=shapeArray.size()-1; counter>=0; counter-- )
-           shapeArray.get(counter).draw(g);
+           shapeArray.get(counter).draw(g2);
         
         //draws the current Shape Object if it is not null
         if (currentShapeObject!=null)
-            currentShapeObject.draw(g);
+            currentShapeObject.draw(g2);
     }
     
     //Mutator methods for currentShapeType, currentShapeColor and currentShapeFilled
@@ -175,6 +180,11 @@ public class DrawPanel extends JPanel
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    public void setImageSize(int imageHeight, int imageWidth) {
+        this.imageHeight = imageHeight;
+        this.imageWidth = imageWidth;
+    }
+    
     /**
      * Private inner class that implements MouseAdapter and does event handling for mouse events.
      */
@@ -186,22 +196,31 @@ public class DrawPanel extends JPanel
          */
         public void mousePressed( MouseEvent event )
         {
-            switch (currentShapeType) //0 for line, 1 for rect, 2 for oval
-            {
-                case 0:
-                    currentShapeObject= new MyLine( event.getX(), event.getY(), 
-                                                   event.getX(), event.getY(), currentShapeColor);
-                    break;
-                case 1:
-                    currentShapeObject= new MyRectangle( event.getX(), event.getY(), 
-                                                        event.getX(), event.getY(), currentShapeColor, currentShapeFilled);
-                    break;
-                case 2:
-                    currentShapeObject= new MyOval( event.getX(), event.getY(), 
-                                                   event.getX(), event.getY(), currentShapeColor, currentShapeFilled);
-                    break;
+
+            if (currentShapeType == 1) 
+                currentShapeObject= new MyMultiLine( event.getX(), event.getY(), event.getX(), event.getY(), Color.red);
+            else if (currentShapeType == 2)
+                currentShapeObject= new MyOval( event.getX(), event.getY(), event.getX(), event.getY(), Color.green, false);
+            else if (currentShapeType == 3){
+                if (currentShapeObject == null) {
+                    currentShapeObject= new MyTriangle( event.getX(), event.getY(), event.getX(), event.getY(), event.getX(), event.getY(), Color.green);
+                    currentShapeObject.setClickCount(1);
+                } else if (currentShapeObject.getClickcount() == 1) {
+                    currentShapeObject.setX2(event.getX());
+                    currentShapeObject.setY2(event.getY());
+                    currentShapeObject.setClickCount(2);
+                } else if (currentShapeObject.getClickcount() == 2) {
+                    currentShapeObject.setX3(event.getX());
+                    currentShapeObject.setY3(event.getY());
+                    currentShapeObject.setClickCount(3);
+                    myShapes.addFront(currentShapeObject); //addFront currentShapeObject onto myShapes
                     
-            }// end switch case
+                    currentShapeObject=null; //sets currentShapeObject to null
+                    clearedShapes.makeEmpty(); //clears clearedShapes
+                    repaint();
+                }
+            }
+                
         } // end method mousePressed
         
         /**
@@ -214,11 +233,20 @@ public class DrawPanel extends JPanel
         public void mouseReleased( MouseEvent event )
         {
             //sets currentShapeObject x2 & Y2
-            currentShapeObject.setX2(event.getX());
-            currentShapeObject.setY2(event.getY());
+            if (currentShapeType == 1) {
+                currentShapeObject.setX2(event.getX());
+                currentShapeObject.setY2(event.getY());
             
-            myShapes.addFront(currentShapeObject); //addFront currentShapeObject onto myShapes
+                myShapes.addFront(currentShapeObject); //addFront currentShapeObject onto myShapes
+            }
+            else if (currentShapeType == 2) {
+                currentShapeObject.setX2(event.getX());
+                currentShapeObject.setY2(event.getY());
             
+                myShapes.addFront(currentShapeObject); //addFront currentShapeObject onto myShapes
+            }
+            
+            if (currentShapeType != 3)
             currentShapeObject=null; //sets currentShapeObject to null
             clearedShapes.makeEmpty(); //clears clearedShapes
             repaint();
@@ -230,7 +258,19 @@ public class DrawPanel extends JPanel
          */
         public void mouseMoved( MouseEvent event )
         {
+            if (currentShapeType == 3 && currentShapeObject != null){
+                if (currentShapeObject.getClickcount() == 1) {
+                    currentShapeObject.setX2(event.getX());
+                    currentShapeObject.setY2(event.getY());
+                } else if (currentShapeObject.getClickcount() == 2) {
+                    currentShapeObject.setX3(event.getX());
+                    currentShapeObject.setY3(event.getY());
+                }
+            }
+            
             statusLabel.setText(String.format("Mouse Coordinates X: %d Y: %d",event.getX(),event.getY()));
+            
+            repaint();
         } // end method mouseMoved
         
         /**
@@ -241,8 +281,12 @@ public class DrawPanel extends JPanel
         public void mouseDragged( MouseEvent event )
         {
             //sets currentShapeObject x2 & Y2
-            currentShapeObject.setX2(event.getX());
-            currentShapeObject.setY2(event.getY());
+            if (currentShapeType == 1) 
+                currentShapeObject.addLine(event.getX(), event.getY());
+            else if (currentShapeType == 2) {
+                currentShapeObject.setX2(event.getX());
+                currentShapeObject.setY2(event.getY());
+            }
             
             //sets statusLabel to current mouse position
             statusLabel.setText(String.format("Mouse Coordinates X: %d Y: %d",event.getX(),event.getY()));

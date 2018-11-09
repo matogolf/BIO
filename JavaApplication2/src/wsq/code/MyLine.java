@@ -1,7 +1,9 @@
 package wsq.code;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 /**
  * This class inherits from MyShape and is responsible for drawing a line.
@@ -32,6 +34,8 @@ public class MyLine extends MyShape
     public void draw( Graphics g )
     {
         g.setColor( getColor() ); //sets the color
-        g.drawLine( getX1(), getY1(), getX2(), getY2() ); //draws the line
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(3.0F));
+        g2.drawLine( getX1(), getY1(), getX2(), getY2() ); //draws the line
     } 
 } // end class MyLine

@@ -8,8 +8,9 @@ import java.awt.Graphics;
  */
 abstract class MyShape
 {
-    private int x1,y1,x2,y2; //coordinates of shape
+    private int x1,y1,x2,y2, x3, y3; //coordinates of shape
     private Color color; // color of shape
+    private int clickCount;
     
     /**
     * public constructor which takes no variables and
@@ -21,7 +22,10 @@ abstract class MyShape
         y1=0;
         x2=0;
         y2=0;
+        x3=0;
+        y3=0;
         color=Color.BLACK;
+        clickCount=0;
     }
     
     /**
@@ -35,7 +39,21 @@ abstract class MyShape
         this.x2=x2;
         this.y2=y2;
         this.color=color;
+        clickCount=0;
     }
+    
+    public MyShape(int x1, int y1, int x2, int y2, int x3, int y3, Color color)
+    {
+        this.x1=x1;
+        this.y1=y1;
+        this.x2=x2;
+        this.y2=y2;
+        this.x3=x3;
+        this.y3=y3;
+        this.color=color;
+        clickCount=0;
+    }
+    
     
     //Mutator methods
     
@@ -71,6 +89,19 @@ abstract class MyShape
         this.y2=y2;
     }   
     
+    public void setX3(int x3)
+    {
+        this.x3=x3;
+    }   
+    
+    /**
+     * Mutator method for y2
+     */
+    public void setY3(int y3)
+    {
+        this.y3=y3;
+    }   
+    
     /**
      * Mutator method for color
      */
@@ -79,7 +110,9 @@ abstract class MyShape
         this.color=color;
     }
     
-    
+    public void setClickCount(int clicks) {
+        this.clickCount = clicks;
+    }
     //Accessor methods
     
     /**
@@ -114,12 +147,33 @@ abstract class MyShape
         return y2;
     }
     
+    public int getX3()
+    {
+        return x3;
+    }
+    
+    /**
+     * Accessor method for y2
+     */
+    public int getY3()
+    {
+        return y3;
+    }
+    
     /**
      * Accessor method for color
      */
     public Color getColor()
     {
         return color;
+    }
+    
+    public int getClickcount(){
+        return clickCount;
+    }
+    
+    public void addLine(int x, int y) {
+        
     }
     
     /**

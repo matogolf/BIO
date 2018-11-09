@@ -51,7 +51,7 @@ import org.jnbis.api.Jnbis;
  * Another for handling both combo box events and checkbox events
  */
 public class DrawFrame extends JFrame
-{
+{  
     private static String WSQ_FILE_NAME;
     private JLabel stausLabel; //label display mouse coordinates
     private DrawPanel panel; //draw panel for the shapes
@@ -116,11 +116,13 @@ public class DrawFrame extends JFrame
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
-    private javax.swing.JButton markantButton;
+    private javax.swing.JButton ovalButton;
+    private javax.swing.JButton triangleButton;
     private javax.swing.JButton rotateButton;
     private javax.swing.JButton textButton;
     private javax.swing.JButton zoomMinusButton;
     private javax.swing.JButton zoomPlusButton;
+    private javax.swing.JButton drawingButton;
     private javax.swing.JSlider brightnessSlider;
     private javax.swing.JLabel brightnessSliderText;
 
@@ -156,12 +158,14 @@ public class DrawFrame extends JFrame
         brightnessButton = new JButton();
         brightnessButtonOK = new JButton("Apply");
         contrastButton = new JButton();
-        markantButton = new JButton();
+        ovalButton = new JButton();
+        triangleButton = new JButton();
         rotateButton = new JButton();
         cropButton = new JButton();
         textButton = new JButton();
         zoomPlusButton = new JButton();
         zoomMinusButton = new JButton();
+        drawingButton = new JButton();
         
         brightnessSliderText = new JLabel();
         brightnessSlider = new JSlider();
@@ -173,24 +177,28 @@ public class DrawFrame extends JFrame
         brightnessButton.setBorderPainted(false);
 
         contrastButton.setBorderPainted(false);
-        markantButton.setBorderPainted(false);
+        ovalButton.setBorderPainted(false);
+        triangleButton.setBorderPainted(false);
         rotateButton.setBorderPainted(false);
         cropButton.setBorderPainted(false);
         textButton.setBorderPainted(false);
         zoomPlusButton.setBorderPainted(false);
         zoomMinusButton.setBorderPainted(false);
+        drawingButton.setBorderPainted(false);
                 
         undo.setFocusable(false);
         redo.setFocusable(false);
         clear.setFocusable(false);
         brightnessButton.setFocusable(false);
         contrastButton.setFocusable(false);
-        markantButton.setFocusable(false);
+        ovalButton.setFocusable(false);
+        triangleButton.setFocusable(false);
         rotateButton.setFocusable(false);
         cropButton.setFocusable(false);
         textButton.setFocusable(false);
         zoomPlusButton.setFocusable(false);
         zoomMinusButton.setFocusable(false);
+        drawingButton.setFocusable(false);
         
         
 //        undo.setMargin(new Insets(0, 0, 0, 0));
@@ -317,12 +325,14 @@ public class DrawFrame extends JFrame
         widgetJPanel.add( clear );
         widgetJPanel.add( brightnessButton );
         widgetJPanel.add( contrastButton );
-        widgetJPanel.add( markantButton );
+        widgetJPanel.add(ovalButton );
+        widgetJPanel.add(triangleButton );
         widgetJPanel.add( rotateButton );
         widgetJPanel.add( cropButton );
         widgetJPanel.add( textButton );
         widgetJPanel.add( zoomPlusButton );
         widgetJPanel.add( zoomMinusButton );
+        widgetJPanel.add( drawingButton );
         
         widgetJPanel.add ( brightnessSliderText );       
         widgetJPanel.add( brightnessSlider );
@@ -393,10 +403,17 @@ public class DrawFrame extends JFrame
             }
         });
         
-        markantButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
-        markantButton.addActionListener(new java.awt.event.ActionListener() {
+        ovalButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
+        ovalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                markantButtonActionPerformed(evt);
+                ovalButtonActionPerformed(evt);
+            }
+        });
+        
+        triangleButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
+        triangleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                triangleButtonActionPerformed(evt);
             }
         });
         
@@ -435,6 +452,13 @@ public class DrawFrame extends JFrame
             }
         });
         
+        drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
+        drawingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drawingButtonActionPerformed(evt);
+            }
+        });
+        
        brightnessSlider.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent event) {
             int value = brightnessSlider.getValue();
@@ -450,15 +474,18 @@ public class DrawFrame extends JFrame
     } // end DrawFrame constructor
     
     private void brightnessSliderChanged() {
-        if (brightnessOn) {
-          upImg = ImageTools.changeBrightness(img, brightnessSlider.getValue());  
+        if (img != null) {
+            if (brightnessOn) {
+              upImg = ImageTools.changeBrightness(img, brightnessSlider.getValue());  
+            }
+            if (contrastOn) {
+              upImg = ImageTools.changeContrast(img, brightnessSlider.getValue());  
+            }
         }
-//        if (contrastOn) {
-//          upImg = ImageTools.changeContrast(img, brightnessSlider.getValue());  
-//        }
+
         
-        
-        panel.importImage(new ImageIcon(upImg).getImage());            
+        if (upImg != null)
+            panel.importImage(new ImageIcon(upImg).getImage());            
         validate();
         repaint();
         
@@ -468,11 +495,15 @@ public class DrawFrame extends JFrame
     private void brightnessButtonActionPerformed(java.awt.event.ActionEvent evt) { 
 
 
-           if (!brightnessSlider.isShowing()) {
+           if (!brightnessSlider.isShowing() || contrastOn) {
+            brightnessSlider.setMinimum(-100);
+            brightnessSlider.setMaximum(100);
+            brightnessSlider.setValue(0);
             brightnessSlider.setVisible(true);
             brightnessSliderText.setVisible(true);
             brightnessButtonOK.setVisible(true);              
             brightnessOn = true;
+            contrastOn = false;
           }
           else { 
             brightnessSlider.setVisible(false);
@@ -480,7 +511,8 @@ public class DrawFrame extends JFrame
             brightnessButtonOK.setVisible(false);  
             brightnessSlider.setValue(0);
             brightnessOn = false;
-            panel.importImage(new ImageIcon(img).getImage());            
+            contrastOn = false;
+            //panel.importImage(new ImageIcon(img).getImage());            
             validate();
             repaint();
             
@@ -491,6 +523,7 @@ public class DrawFrame extends JFrame
         brightnessSliderText.setVisible(false);
         brightnessButtonOK.setVisible(false);     
         brightnessOn = false;
+        contrastOn = false;
         brightnessSlider.setValue(0);
         img = upImg;
     }
@@ -498,29 +531,36 @@ public class DrawFrame extends JFrame
     
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {   
         
-//        if (!brightnessSlider.isShowing()) {
-//            brightnessSlider.setVisible(true);
-//            brightnessSliderText.setVisible(true);  
-//            contrastOn = true;
-//          }
-//          else {  
-//            brightnessSlider.setVisible(false);
-//            brightnessSliderText.setVisible(false);
-//            contrastOn = false;
-//            img = upImg;
-//          }
-        
-        
-//        RescaleOp rescaleOp = new RescaleOp(1.1f, 0, null);
-//        rescaleOp.filter(img, img);
-//        
-//        panel.importImage(new ImageIcon(img).getImage());            
-//        validate();
-//        repaint();
+           if (!brightnessSlider.isShowing() || brightnessOn) {
+            brightnessSlider.setMinimum(0);
+            brightnessSlider.setMaximum(150);
+            brightnessSlider.setValue(0);
+            brightnessSlider.setVisible(true);
+            brightnessSliderText.setVisible(true);
+            brightnessButtonOK.setVisible(true);              
+            contrastOn = true;
+            brightnessOn = false;
+          }
+          else { 
+            brightnessSlider.setVisible(false);
+            brightnessSliderText.setVisible(false);
+            brightnessButtonOK.setVisible(false);  
+            brightnessSlider.setValue(0);
+            contrastOn = false;
+            brightnessOn = false;
+            //panel.importImage(new ImageIcon(img).getImage());            
+            validate();
+            repaint();
+            
+          }
     }  
     
-    private void markantButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+    private void ovalButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        panel.setCurrentShapeType(2);
+    }
+    
+    private void triangleButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        panel.setCurrentShapeType(3);
     }
     
     private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
@@ -546,6 +586,10 @@ public class DrawFrame extends JFrame
     
     private void zoomMinusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
         // TODO add your handling code here:
+    }
+    
+    private void drawingButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+        panel.setCurrentShapeType(1);
     }
     
     private void importBitmapActionPerformed(ActionEvent evt) {
@@ -678,6 +722,8 @@ public class DrawFrame extends JFrame
             int x = (int) newImgSize.getWidth();
             int y = (int) newImgSize.getHeight();
             img = ImageTools.resize(img, x, y);
+            
+            panel.setImageSize(x, y);
             
             panel.importImage(new javax.swing.ImageIcon(img).getImage());            
             validate();
