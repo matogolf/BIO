@@ -19,6 +19,8 @@ import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.io.ByteArrayInputStream;
@@ -148,6 +150,7 @@ public class DrawFrame extends JFrame
         yBoundery = this.screenHeight - yBorder;
         
         panel = new DrawPanel(statusLabel, this); //create draw panel and pass in JLabel
+        panel.setLayout(null);
         
         //create buttons
         undo = new JButton( "Undo" );
@@ -229,6 +232,7 @@ public class DrawFrame extends JFrame
         importWsq.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
         importWsq.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 importWsqActionPerformed(evt);
             }
         });
@@ -238,6 +242,7 @@ public class DrawFrame extends JFrame
         importBitmap.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
         importBitmap.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 importBitmapActionPerformed(evt);
             }
         });
@@ -247,6 +252,7 @@ public class DrawFrame extends JFrame
         quit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
         quit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 quitPerformed(evt);
             }
         });
@@ -266,6 +272,7 @@ public class DrawFrame extends JFrame
         ImporttoFBI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
         ImporttoFBI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 ImporttoFBIPerformed(evt);
             }
         });
@@ -275,6 +282,7 @@ public class DrawFrame extends JFrame
         CallThePolice.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         CallThePolice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 CallThePolicePerformed(evt);
             }
         });
@@ -287,6 +295,7 @@ public class DrawFrame extends JFrame
         ConvertWSQtoJPG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoJPG.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 ConvertWSQtoJPGPerformed(evt);
             }
         });
@@ -296,6 +305,7 @@ public class DrawFrame extends JFrame
         ConvertWSQtoGIF.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoGIF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 ConvertWSQtoGIFPerformed(evt);
             }
         });
@@ -305,6 +315,7 @@ public class DrawFrame extends JFrame
         ConvertWSQtoPNG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoPNG.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 ConvertWSQtoPNGPerformed(evt);
             }
         });
@@ -387,11 +398,13 @@ public class DrawFrame extends JFrame
         brightnessButton.setIcon(new ImageIcon(getClass().getResource("/resources/brightness.png")));
         brightnessButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 brightnessButtonActionPerformed(evt);
             }
         });
         brightnessButtonOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 brightnessButtonOKActionPerformed(evt);
             }
         });
@@ -399,6 +412,7 @@ public class DrawFrame extends JFrame
         contrastButton.setIcon(new ImageIcon(getClass().getResource("/resources/contrast.png")));
         contrastButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 contrastButtonActionPerformed(evt);
             }
         });
@@ -406,6 +420,7 @@ public class DrawFrame extends JFrame
         ovalButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
         ovalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 ovalButtonActionPerformed(evt);
             }
         });
@@ -413,6 +428,7 @@ public class DrawFrame extends JFrame
         triangleButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
         triangleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 triangleButtonActionPerformed(evt);
             }
         });
@@ -420,6 +436,7 @@ public class DrawFrame extends JFrame
         rotateButton.setIcon(new ImageIcon(getClass().getResource("/resources/rotate.PNG")));
         rotateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 rotateButtonActionPerformed(evt);
             }
         });
@@ -427,6 +444,7 @@ public class DrawFrame extends JFrame
         cropButton.setIcon(new ImageIcon(getClass().getResource("/resources/crop.png")));
         cropButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 cropButtonActionPerformed(evt);
             }
         });
@@ -434,6 +452,7 @@ public class DrawFrame extends JFrame
         textButton.setIcon(new ImageIcon(getClass().getResource("/resources/text.png")));
         textButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 textButtonActionPerformed(evt);
             }
         });
@@ -441,6 +460,7 @@ public class DrawFrame extends JFrame
         zoomPlusButton.setIcon(new ImageIcon(getClass().getResource("/resources/zoomPlus.PNG")));
         zoomPlusButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 zoomPlusButtonActionPerformed(evt);
             }
         });
@@ -448,6 +468,7 @@ public class DrawFrame extends JFrame
         zoomMinusButton.setIcon(new ImageIcon(getClass().getResource("/resources/zoomMinus.PNG")));
         zoomMinusButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 zoomMinusButtonActionPerformed(evt);
             }
         });
@@ -455,6 +476,7 @@ public class DrawFrame extends JFrame
         drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
         drawingButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
                 drawingButtonActionPerformed(evt);
             }
         });
@@ -470,6 +492,12 @@ public class DrawFrame extends JFrame
         setSize( 700, 800 );
         setMinimumSize(new Dimension(700, 800));
         setVisible( true );
+        
+    this.addWindowFocusListener(new WindowAdapter() {
+        public void windowGainedFocus(WindowEvent e) {
+        panel.requestFocusInWindow();
+        }
+    });
         
     } // end DrawFrame constructor
     
@@ -532,8 +560,8 @@ public class DrawFrame extends JFrame
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {   
         
            if (!brightnessSlider.isShowing() || brightnessOn) {
-            brightnessSlider.setMinimum(0);
-            brightnessSlider.setMaximum(150);
+            brightnessSlider.setMinimum(-100);
+            brightnessSlider.setMaximum(100);
             brightnessSlider.setValue(0);
             brightnessSlider.setVisible(true);
             brightnessSliderText.setVisible(true);
@@ -577,7 +605,7 @@ public class DrawFrame extends JFrame
     }
     
     private void textButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+        panel.setCurrentShapeType(4);
     }
     
     private void zoomPlusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
@@ -763,7 +791,7 @@ public class DrawFrame extends JFrame
 
         WSQ_FILE_NAME = filepath;
 
-        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".jpg   ";
+        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".jpg";
         
         File jpg = Jnbis.wsq()
                 .decode(WSQ_FILE_NAME)
@@ -788,5 +816,9 @@ public class DrawFrame extends JFrame
                 .toGif()
                 .asFile(newFilePath);             
     }     
+    
+    public void addLabel(JLabel label) {
+        panel.add(label);
+    }
     
 } // end class DrawFrame

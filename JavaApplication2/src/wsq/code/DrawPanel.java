@@ -8,6 +8,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.util.List;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
@@ -16,6 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import net.java.balloontip.BalloonTip;
+import net.java.balloontip.styles.BalloonTipStyle;
+import net.java.balloontip.styles.EdgedBalloonStyle;
 
 /**
  * This class handles mouse events and uses them to draw shapes.
@@ -35,7 +41,7 @@ public class DrawPanel extends JPanel
     private LinkedList<MyShape> clearedShapes; //dynamic stack of cleared shapes from undo
     
     //current Shape variables
-    private int currentShapeType; //0 for line, 1 for rect, 2 for oval
+    private int currentShapeType; // 1 for line, 2 for oval, 3 for triangle, 4 for text
     private MyShape currentShapeObject; //stores the current shape object
     private Color currentShapeColor; //current shape color
     private boolean currentShapeFilled; //determine whether shape is filled or not
@@ -44,6 +50,7 @@ public class DrawPanel extends JPanel
     private boolean paintNow = false;
     private int oldX, oldY, nowX, nowY;
     private int imageHeight = 0, imageWidth = 0;
+    private List<BalloonPoint> textBoxes;
     
     
     JLabel statusLabel; //status label for mouse coordinates
@@ -55,10 +62,12 @@ public class DrawPanel extends JPanel
      * Sets up the panel and adds event handling for mouse events.
      */
     public DrawPanel(JLabel statusLabel, DrawFrame myFrame){
+        this.textBoxes = new ArrayList<BalloonPoint>();
         
         this.myFrame = myFrame;
         myShapes = new LinkedList<MyShape>(); //initialize myShapes dynamic stack
         clearedShapes = new LinkedList<MyShape>(); //initialize clearedShapes dynamic stack
+        textBoxes = new ArrayList<BalloonPoint>();
         
         //Initialize current Shape variables
         currentShapeType=-1;
@@ -76,6 +85,8 @@ public class DrawPanel extends JPanel
         MouseHandler handler = new MouseHandler();                                    
         addMouseListener( handler );
         addMouseMotionListener( handler ); 
+        MyKeyListener keyListener = new MyKeyListener();
+        addKeyListener(keyListener);
         
     }
     
@@ -196,6 +207,8 @@ public class DrawPanel extends JPanel
          */
         public void mousePressed( MouseEvent event )
         {
+            
+            setTextBoxesInvisible();
 
             if (currentShapeType == 1) 
                 currentShapeObject= new MyMultiLine( event.getX(), event.getY(), event.getX(), event.getY(), Color.red);
@@ -219,6 +232,28 @@ public class DrawPanel extends JPanel
                     clearedShapes.makeEmpty(); //clears clearedShapes
                     repaint();
                 }
+            } else if (currentShapeType == 4) {
+                
+                int x = event.getX();
+                int y = event.getY();
+                int bubbleX, bubbleY;
+                
+                BalloonPoint textBox = null;
+                for ( int counter=textBoxes.size()-1; counter>=0; counter-- )  {
+                    textBox = textBoxes.get(counter);
+                    bubbleX = textBox.getX();
+                    bubbleY = textBox.getY();
+                    if (x >= (bubbleX - 5) && x <= (bubbleX + 5) && y >= (bubbleY - 5) && y <= (bubbleY + 5) && !textBox.isVisible()) { //cursor is within bubble point
+                        textBox.enableInput();
+                        return;
+                    }
+
+                } 
+                
+                textBox = new BalloonPoint(event.getX(), event.getY());
+                myFrame.addLabel(textBox.getLabel());
+                textBox.enableInput();
+                textBoxes.add(textBox);
             }
                 
         } // end method mousePressed
@@ -258,16 +293,34 @@ public class DrawPanel extends JPanel
          */
         public void mouseMoved( MouseEvent event )
         {
+            
+            int x = event.getX();
+            int y = event.getY();
+            
             if (currentShapeType == 3 && currentShapeObject != null){
                 if (currentShapeObject.getClickcount() == 1) {
-                    currentShapeObject.setX2(event.getX());
-                    currentShapeObject.setY2(event.getY());
+                    currentShapeObject.setX2(x);
+                    currentShapeObject.setY2(y);
                 } else if (currentShapeObject.getClickcount() == 2) {
-                    currentShapeObject.setX3(event.getX());
-                    currentShapeObject.setY3(event.getY());
+                    currentShapeObject.setX3(x);
+                    currentShapeObject.setY3(y);
                 }
             }
+            int bubbleX, bubbleY;
             
+            BalloonPoint textBox = null;
+            for ( int counter=textBoxes.size()-1; counter>=0; counter-- )  {
+                textBox = textBoxes.get(counter);
+                bubbleX = textBox.getX();
+                bubbleY = textBox.getY();
+                if (x >= (bubbleX - 5) && x <= (bubbleX + 5) && y >= (bubbleY - 5) && y <= (bubbleY + 5) && !textBox.isVisible()) { //cursor is within bubble point
+                    textBox.setVisible();
+                } else {
+                    textBox.setInvisible();
+                }
+                
+            }           
+
             statusLabel.setText(String.format("Mouse Coordinates X: %d Y: %d",event.getX(),event.getY()));
             
             repaint();
@@ -297,4 +350,60 @@ public class DrawPanel extends JPanel
         
     }// end MouseHandler
     
+    
+    public class MyKeyListener implements KeyListener {
+        
+        @Override
+        public void keyPressed(KeyEvent e) {
+
+            int key = e.getKeyCode();
+            char keyChar = e.getKeyChar();
+            BalloonPoint textBox = null;
+
+            for ( int counter=textBoxes.size()-1; counter>=0; counter-- ) {
+                textBox = textBoxes.get(counter);
+                if (textBox.isInputEnabled()) {
+                    if (key == KeyEvent.VK_ENTER || key == KeyEvent.VK_ESCAPE) {
+                        textBox.disableInput();
+                    } else if (key == KeyEvent.VK_BACK_SPACE) {
+                        textBox.removeInput();
+                    } else if (key == KeyEvent.VK_DELETE) {
+                        DrawPanel.this.remove(textBox.getLabel());
+                        textBox.disableInput();
+                        textBoxes.remove(counter);
+                        textBox = null;
+                    } else if (keyChar != KeyEvent.VK_UNDEFINED) {
+                        textBox.addInput(keyChar);
+                    }
+                    break; //only 1 textbox should be enabled so break
+                }
+            }
+
+            repaint();
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            ;
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            ;
+        }
+    }
+    
+    public void setTextBoxesInvisible() {
+        
+        BalloonPoint textBox = null;
+        
+        for ( int counter=textBoxes.size()-1; counter>=0; counter-- )  {
+            
+            textBox = textBoxes.get(counter);
+            textBox.disableInput();
+        }           
+
+        repaint();
+        
+    }
 } // end class DrawPanel

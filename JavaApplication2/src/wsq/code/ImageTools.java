@@ -146,14 +146,31 @@ public class ImageTools {
             int b = c.getBlue();   
             int g = c.getGreen();
             //adding factor to rgb values
-            if (c.getRed() > 127) {
-                r = c.getRed() + contrast;   
-                b = c.getBlue() + contrast;   
-                g = c.getGreen() + contrast;   
+            
+            if (contrast >=0) {
+                if (c.getRed() > 127) {
+                    r = c.getRed() + contrast;   
+                    b = c.getBlue() + contrast;   
+                    g = c.getGreen() + contrast;   
+                } else {
+                    r = c.getRed() - contrast;   
+                    b = c.getBlue() - contrast;   
+                    g = c.getGreen() - contrast;  
+                }
             } else {
-                r = c.getRed() - contrast;   
-                b = c.getBlue() - contrast;   
-                g = c.getGreen() - contrast;  
+                if (c.getRed() > 127) {
+                    r = c.getRed() + contrast;   
+                    b = c.getBlue() + contrast;   
+                    g = c.getGreen() + contrast;   
+                    if (r < 127) 
+                        r = b = g = 127; //we dont want inverted colors...
+                } else {
+                    r = c.getRed() - contrast;   
+                    b = c.getBlue() - contrast;   
+                    g = c.getGreen() - contrast;  
+                    if (r > 127)
+                        r = b = g = 127;
+                }
             }
  
             if (r >= 256) {
