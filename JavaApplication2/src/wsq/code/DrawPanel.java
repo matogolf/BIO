@@ -191,9 +191,10 @@ public class DrawPanel extends JPanel
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public void setImageSize(int imageHeight, int imageWidth) {
-        this.imageHeight = imageHeight;
+    public void setImageSize(int mageWidth, int imageHeight) {
+        
         this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
     }
     
     /**
@@ -250,7 +251,7 @@ public class DrawPanel extends JPanel
 
                 } 
                 
-                textBox = new BalloonPoint(event.getX(), event.getY());
+                textBox = new BalloonPoint(event.getX(), event.getY(), imageWidth, imageHeight);
                 myFrame.addLabel(textBox.getLabel());
                 textBox.enableInput();
                 textBoxes.add(textBox);
@@ -313,7 +314,7 @@ public class DrawPanel extends JPanel
                 textBox = textBoxes.get(counter);
                 bubbleX = textBox.getX();
                 bubbleY = textBox.getY();
-                if (x >= (bubbleX - 5) && x <= (bubbleX + 5) && y >= (bubbleY - 5) && y <= (bubbleY + 5) && !textBox.isVisible()) { //cursor is within bubble point
+                if (x >= (bubbleX - 5) && x <= (bubbleX + 5) && y >= (bubbleY - 5) && y <= (bubbleY + 5)) { //cursor is within bubble point
                     textBox.setVisible();
                 } else {
                     textBox.setInvisible();
@@ -405,5 +406,14 @@ public class DrawPanel extends JPanel
 
         repaint();
         
+    }
+    
+    public void redrawTextPoints() {
+        
+        BalloonPoint textBox = null;
+        for ( int counter=textBoxes.size()-1; counter>=0; counter-- )  {
+            textBox = textBoxes.get(counter);
+            textBox.rotatePoint();
+        }       
     }
 } // end class DrawPanel
