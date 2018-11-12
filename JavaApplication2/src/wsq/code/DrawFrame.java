@@ -593,11 +593,15 @@ public class DrawFrame extends JFrame
     
     private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
 //        img = ImageTools.rotate(img);
-        img = ImageTools.rotate(img);
-                
-        panel.importImage(new ImageIcon(img).getImage());  
-        validate();
-        repaint();
+        if (img != null) {
+            img = ImageTools.rotate(img);
+            
+            panel.importImage(new ImageIcon(img).getImage());  
+            
+            panel.redrawTextPoints();
+            validate();
+            repaint();
+        }
     }  
     
     private void cropButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 

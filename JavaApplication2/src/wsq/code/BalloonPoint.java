@@ -23,9 +23,10 @@ public class BalloonPoint {
     private boolean inputEnabled;
     private String bubbleText;
     private boolean isVisible;
+    private int imageWidth, imageHeight;
     
     
-    public BalloonPoint(int x, int y) {
+    public BalloonPoint(int x, int y, int imageWidth, int imageHeight) {
         
         point = new JLabel("Test label");  
         this.x = x;
@@ -39,6 +40,8 @@ public class BalloonPoint {
         myBalloonTip = new BalloonTip(point, "", edgedLook, true);
         bubbleText = "";
         isVisible = true;
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
     }
     
     public JLabel getLabel() {
@@ -103,6 +106,15 @@ public class BalloonPoint {
     
     public boolean isVisible() {
         return isVisible;
+    }
+    
+    public void rotatePoint() {
+        int newX = imageHeight - y;
+        int newY = x;
+        point.setLocation(newX, newY);
+        x = newX;
+        y = newY;
+        System.out.println("newx: "+x+" newy: "+y);
     }
     
 }
