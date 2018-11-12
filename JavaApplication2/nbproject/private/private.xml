@@ -3,15 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/DrawFrame.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/TestDraw.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/DrawPanel.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/MyLine.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/MyOval.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/MyTriangle.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/MyShape.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/MyMultiLine.java</file>
-            <file>file:/C:/School/BIO/JavaApplication2/src/wsq/code/ImageTools.java</file>
+            <file>file:/home/matogolf/NetBeansProjects/JavaApplication2/src/wsq/code/MyLine.java</file>
+            <file>file:/home/matogolf/NetBeansProjects/JavaApplication2/src/wsq/code/DrawPanel.java</file>
+            <file>file:/home/matogolf/NetBeansProjects/JavaApplication2/src/wsq/code/DrawFrame.java</file>
+            <file>file:/home/matogolf/NetBeansProjects/JavaApplication2/src/wsq/code/BalloonPoint.java</file>
+            <file>file:/home/matogolf/NetBeansProjects/JavaApplication2/src/wsq/code/MyOval.java</file>
+            <file>file:/home/matogolf/NetBeansProjects/JavaApplication2/src/wsq/code/ImageTools.java</file>
         </group>
     </open-files>
 </project-private>

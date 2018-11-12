@@ -153,9 +153,10 @@ public class DrawFrame extends JFrame
         panel.setLayout(null);
         
         //create buttons
-        undo = new JButton( "Undo" );
-        redo = new JButton( "Redo" );
-        clear = new JButton( "Clear" );
+        undo = new JButton( " Undo" );
+        redo = new JButton( " Redo" );
+        clear = new JButton( " Clear" );
+        
         
         importImg = new javax.swing.JLabel();
         brightnessButton = new JButton();
@@ -269,7 +270,7 @@ public class DrawFrame extends JFrame
         menu2.add(menu3); 
         
         JMenuItem ImporttoFBI = new JMenuItem("Import to FBI Database...");
-        ImporttoFBI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        ImporttoFBI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
         ImporttoFBI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
@@ -279,7 +280,7 @@ public class DrawFrame extends JFrame
         menu2.add(ImporttoFBI);
     
         JMenuItem CallThePolice = new JMenuItem("Call the police...");
-        CallThePolice.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        CallThePolice.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
         CallThePolice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
@@ -302,7 +303,7 @@ public class DrawFrame extends JFrame
         menu3.add(ConvertWSQtoJPG); 
         
         JMenuItem ConvertWSQtoGIF = new JMenuItem("Convert WSQ to GIF...");
-        ConvertWSQtoGIF.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        ConvertWSQtoGIF.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoGIF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
@@ -332,18 +333,32 @@ public class DrawFrame extends JFrame
             
         // add widgets to widgetJPanel
         widgetJPanel.add( undo );
+        undo.setToolTipText("Undo: Reverse last action");
         widgetJPanel.add( redo );
+        redo.setToolTipText("Redo: Reverse last Undo");
         widgetJPanel.add( clear );
+        clear.setToolTipText("Clear: Reset all changes");
         widgetJPanel.add( brightnessButton );
+        brightnessButton.setToolTipText("Brightness: Set brightness of image");
         widgetJPanel.add( contrastButton );
-        widgetJPanel.add(ovalButton );
-        widgetJPanel.add(triangleButton );
-        widgetJPanel.add( rotateButton );
-        widgetJPanel.add( cropButton );
-        widgetJPanel.add( textButton );
-        widgetJPanel.add( zoomPlusButton );
-        widgetJPanel.add( zoomMinusButton );
+        contrastButton.setToolTipText("Contrast: Set contrast of image");
+        widgetJPanel.add( triangleButton );
+        triangleButton.setToolTipText("Triangle: Draw triangle for minutiae points");
+        widgetJPanel.add( ovalButton );
+        ovalButton.setToolTipText("Ellipse: Draw ellipse for minutiae points");
         widgetJPanel.add( drawingButton );
+        drawingButton.setToolTipText("Pen: Draw lines for minutiae points or papillary lines");
+        widgetJPanel.add( rotateButton );
+        rotateButton.setToolTipText("Rotate: Rotate image 90 degress to the right");
+        widgetJPanel.add( cropButton );
+        cropButton.setToolTipText("Crop: Crop image");
+        widgetJPanel.add( textButton );
+        textButton.setToolTipText("Notes: Add notes to the image");
+        widgetJPanel.add( zoomPlusButton );
+        zoomPlusButton.setToolTipText("Zoom In: Adjust zoom level");
+        widgetJPanel.add( zoomMinusButton );
+        zoomMinusButton.setToolTipText("Zoom Out: Adjust zoom level");
+        
         
         widgetJPanel.add ( brightnessSliderText );       
         widgetJPanel.add( brightnessSlider );
@@ -417,7 +432,7 @@ public class DrawFrame extends JFrame
             }
         });
         
-        ovalButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
+        ovalButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantEllipse.png")));
         ovalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
@@ -425,11 +440,19 @@ public class DrawFrame extends JFrame
             }
         });
         
-        triangleButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
+        triangleButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantTriangle.png")));
         triangleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
                 triangleButtonActionPerformed(evt);
+            }
+        });
+                
+        drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantLine.png")));
+        drawingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
+                drawingButtonActionPerformed(evt);
             }
         });
         
@@ -473,13 +496,6 @@ public class DrawFrame extends JFrame
             }
         });
         
-        drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markant.png")));
-        drawingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                panel.setTextBoxesInvisible();
-                drawingButtonActionPerformed(evt);
-            }
-        });
         
        brightnessSlider.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent event) {
@@ -489,7 +505,7 @@ public class DrawFrame extends JFrame
     });
        
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        setSize( 700, 800 );
+        setSize( 700, 880 );
         setMinimumSize(new Dimension(700, 800));
         setVisible( true );
         
@@ -576,7 +592,6 @@ public class DrawFrame extends JFrame
             brightnessSlider.setValue(0);
             contrastOn = false;
             brightnessOn = false;
-            //panel.importImage(new ImageIcon(img).getImage());            
             validate();
             repaint();
             
@@ -605,7 +620,11 @@ public class DrawFrame extends JFrame
     }  
     
     private void cropButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+      
+      img = img.getSubimage(100, 100, 200, 500);
+      panel.importImage(new ImageIcon(img).getImage());
+      validate();
+      repaint();
     }
     
     private void textButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
@@ -682,15 +701,16 @@ public class DrawFrame extends JFrame
             if (event.getSource() == undo){
                 panel.clearLastShape();
             }
-            else if (event.getActionCommand().equals("Redo")){
+            else if (event.getSource() == redo){
                 panel.redoLastShape();
             }
             // clear button - reset img
-            else if (event.getActionCommand().equals("Clear")){
-//                panel.clearDrawing();
+            else if (event.getSource() == clear){
+                panel.clearDrawing();
                 Dimension newImgSize = ImageTools.getScaledDimension(defaultImg.getWidth(), defaultImg.getHeight(), xBoundery, yBoundery);
                 int x = (int) newImgSize.getWidth();
                 int y = (int) newImgSize.getHeight();
+                
                 defaultImg = ImageTools.resize(defaultImg, x, y);
                 panel.importImage(new javax.swing.ImageIcon(defaultImg).getImage());            
                 validate();
