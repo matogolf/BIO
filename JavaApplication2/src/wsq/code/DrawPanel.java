@@ -93,12 +93,40 @@ public class DrawPanel extends JPanel
     /**
      * Calls the draw method for the existing shapes.
      */
+    
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+//    public void paintComponent( Graphics g )
+//    {
+//        
+//        Graphics2D g2 = null;
+//        super.paintComponent( g );
+//        g2 = (Graphics2D) g;
+//
+//        g.drawImage(img, 0, 0, null); 
+//        //g.drawImage(myImage, 0, 0, this);
+//        
+//        // draw the shapes
+//        ArrayList<MyShape> shapeArray=myShapes.getArray();
+//        for ( int counter=shapeArray.size()-1; counter>=0; counter-- )
+//           shapeArray.get(counter).draw(g2);
+//        
+//        //draws the current Shape Object if it is not null
+//        if (currentShapeObject!=null)
+//            currentShapeObject.draw(g2);
+//        
+//    }
+//%%%%%%%%55 @Timo First or Second    
     public void paintComponent( Graphics g )
     {
-        super.paintComponent( g );
-        Graphics2D g2 = (Graphics2D) g;
         
+        Graphics2D g2 = null;
+        super.paintComponent( g );
 
+          
+        if (img != null) {
+           g2 = (Graphics2D) img.getGraphics();
+        } 
+                
         g.drawImage(img, 0, 0, null); 
         //g.drawImage(myImage, 0, 0, this);
         
@@ -110,7 +138,15 @@ public class DrawPanel extends JPanel
         //draws the current Shape Object if it is not null
         if (currentShapeObject!=null)
             currentShapeObject.draw(g2);
+              
     }
+        
+    public Image getImage() {
+        return img;
+    }
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    
+    
     
     //Mutator methods for currentShapeType, currentShapeColor and currentShapeFilled
     

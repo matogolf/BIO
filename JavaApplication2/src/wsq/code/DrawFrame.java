@@ -20,12 +20,14 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.RescaleOp;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
@@ -40,6 +42,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -51,6 +54,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileSystemView;
 import org.jnbis.api.Jnbis;
 
 
@@ -305,6 +309,17 @@ public class DrawFrame extends JFrame
             }
         });
         menu1.add(importBitmap);
+        
+        JMenuItem saveAs = new JMenuItem("Save as...");
+        saveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        saveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
+                saveFileAsPerformed(evt);                
+            }
+        });
+        menu1.add(saveAs);
+                
         
         JMenuItem quit = new JMenuItem("Quit");
         quit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
@@ -817,12 +832,28 @@ public class DrawFrame extends JFrame
         panel.setCurrentShapeType(4);
     }
     
-    private void zoomPlusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+    private void zoomPlusButtonActionPerformed(java.awt.event.ActionEvent evt) { 
+        if (img != null) {
+            img = ImageTools.zoomIn(img);
+            
+            panel.importImage(new ImageIcon(img).getImage());  
+            
+            panel.redrawTextPoints();
+            validate();
+            repaint();
+        }            
     }
     
     private void zoomMinusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        // TODO add your handling code here:
+        if (img != null) {
+            img = ImageTools.zoomOut(img);
+            
+            panel.importImage(new ImageIcon(img).getImage());  
+            
+            panel.redrawTextPoints();
+            validate();
+            repaint();
+        } 
     }
     
     private void drawingButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
@@ -853,6 +884,30 @@ public class DrawFrame extends JFrame
             Logger.getLogger(DrawFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    private void saveFileAsPerformed(ActionEvent evt) {
+        JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        jfc.setDialogTitle("Choose a directory to save your file: ");
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int returnValue = jfc.showSaveDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+                if (jfc.getSelectedFile().isDirectory()) {
+                        System.out.println("You selected the directory: " + jfc.getSelectedFile());
+                }
+        }
+        
+        try {
+//            Image img_new = panel.getImage();
+//            System.out.println(img_new);
+            System.out.println(img);            
+            File outputfile = new File(jfc.getSelectedFile()+"/saved.jpg");
+            ImageIO.write((RenderedImage) img, "jpg", outputfile);
+        } catch (IOException e) {
+            // handle exception
+        }        
+    }
+        
     
     private void quitPerformed(ActionEvent evt) {
         System.exit(0);
