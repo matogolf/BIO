@@ -6,16 +6,21 @@
 package wsq.code;
 
 import com.sun.org.glassfish.external.statistics.annotations.Reset;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import sun.net.www.content.audio.x_aiff;
 
 /**
@@ -220,6 +225,22 @@ public class ImageTools {
             
             img = ImageTools.resize(img, x, y);
             return img;
+    }
+    
+    public static BufferedImage cropView(BufferedImage img, int top, int bottom, int left, int right) {
+     
+     bottom = img.getHeight()-bottom;
+     right = img.getWidth()-right;
+     
+     for (int i = 0; i < img.getWidth(); i++) {
+                for (int j = 0; j < img.getHeight(); j++) {
+                    if (i == left || i == right || i == left-1 || i == right-1 || i == left-2 || i == right-2 )
+                        img.setRGB(i, j, new Color(255, 0, 0, 255).getRGB());
+                    if (j == top || j == bottom || j == top-1 || j == bottom-1 || j == top-2 || j == bottom-2)
+                        img.setRGB(i, j, new Color(255, 0, 0, 255).getRGB());
+                }
+            }
+        return img;
     }
             
     

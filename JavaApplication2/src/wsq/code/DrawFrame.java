@@ -1,5 +1,6 @@
 package wsq.code;
 
+import java.awt.BasicStroke;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -15,17 +16,22 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.RescaleOp;
+import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Math.abs;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,11 +39,16 @@ import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.jnbis.api.Jnbis;
@@ -67,6 +78,7 @@ public class DrawFrame extends JFrame
 //    public int contrastLevel = 0;       // uroven kontrastu
     public boolean brightnessOn = false; 
     public boolean contrastOn = false;
+    public boolean cropOn = false;
     
     private JButton undo; // button to undo last drawn shape
     private JButton redo; // button to redo an undo
@@ -105,6 +117,7 @@ public class DrawFrame extends JFrame
     private JButton brightnessButtonOK;
     private javax.swing.JButton contrastButton;
     private javax.swing.JButton cropButton;
+    private JButton cropButtonOK; 
     public javax.swing.JLabel imgViewerLabel;
     private javax.swing.JLabel importImg;
     private javax.swing.JMenu jMenu1;
@@ -127,7 +140,23 @@ public class DrawFrame extends JFrame
     private javax.swing.JButton drawingButton;
     private javax.swing.JSlider brightnessSlider;
     private javax.swing.JLabel brightnessSliderText;
-
+    //spinnery omg
+    private javax.swing.JSpinner spinnerTop;
+    private javax.swing.JSpinner spinnerBottom;
+    private javax.swing.JSpinner spinnerLeft;
+    private javax.swing.JSpinner spinnerRight;
+    private javax.swing.SpinnerModel modelTop;
+    private javax.swing.SpinnerModel modelBottom;
+    private javax.swing.SpinnerModel modelLeft;
+    private javax.swing.SpinnerModel modelRight;
+    private javax.swing.JLabel lTop;
+    private javax.swing.JLabel lBottom;
+    private javax.swing.JLabel lLeft;
+    private javax.swing.JLabel lRight;
+    private javax.swing.JComponent centerTop;
+    private javax.swing.JComponent centerBottom;
+    private javax.swing.JComponent centerLeft;
+    private javax.swing.JComponent centerRight;
     
     /**
      * This constructor sets the name of the JFrame.
@@ -161,6 +190,7 @@ public class DrawFrame extends JFrame
         importImg = new javax.swing.JLabel();
         brightnessButton = new JButton();
         brightnessButtonOK = new JButton("Apply");
+        cropButtonOK = new  JButton("Apply");
         contrastButton = new JButton();
         ovalButton = new JButton();
         triangleButton = new JButton();
@@ -173,6 +203,33 @@ public class DrawFrame extends JFrame
         
         brightnessSliderText = new JLabel();
         brightnessSlider = new JSlider();
+        
+        
+        modelTop = new SpinnerNumberModel(0, 0, 100, 1);
+        modelBottom = new SpinnerNumberModel(0, 0, 100, 1);
+        modelLeft = new SpinnerNumberModel(0, 0, 100, 1);
+        modelRight = new SpinnerNumberModel(0, 0, 100, 1);
+//        spinnerTop = addLabeledSpinner(widgetJPanel,"Kek",modelTop);
+        spinnerTop = new JSpinner(modelTop);
+        spinnerBottom = new JSpinner(modelBottom);
+        spinnerLeft = new JSpinner(modelLeft);
+        spinnerRight = new JSpinner(modelRight);
+        lTop =      new JLabel("    Top:");
+        lBottom =   new JLabel("  Bottom:");
+        lLeft =     new JLabel("    Left:");
+        lRight =    new JLabel("    Right:");
+        centerTop = spinnerTop.getEditor();
+        centerBottom = spinnerBottom.getEditor();
+        centerLeft = spinnerLeft.getEditor();
+        centerRight = spinnerRight.getEditor();
+        JSpinner.DefaultEditor spinnerEditor1 = (JSpinner.DefaultEditor)centerTop;
+        JSpinner.DefaultEditor spinnerEditor2 = (JSpinner.DefaultEditor)centerBottom;
+        JSpinner.DefaultEditor spinnerEditor3 = (JSpinner.DefaultEditor)centerLeft;
+        JSpinner.DefaultEditor spinnerEditor4 = (JSpinner.DefaultEditor)centerRight;
+        spinnerEditor1.getTextField().setHorizontalAlignment(JTextField.CENTER);
+        spinnerEditor2.getTextField().setHorizontalAlignment(JTextField.CENTER);
+        spinnerEditor3.getTextField().setHorizontalAlignment(JTextField.CENTER);
+        spinnerEditor4.getTextField().setHorizontalAlignment(JTextField.CENTER);
         
 
         undo.setBorderPainted(false);
@@ -383,6 +440,32 @@ public class DrawFrame extends JFrame
         
         brightnessSlider.addChangeListener(e -> brightnessSliderChanged() );
         
+        Dimension d = new Dimension(75, 30);
+        spinnerTop.setPreferredSize(d);spinnerTop.setMaximumSize(d);
+        spinnerBottom.setPreferredSize(d);spinnerBottom.setMaximumSize(d);
+        spinnerLeft.setPreferredSize(d);spinnerLeft.setMaximumSize(d);
+        spinnerRight.setPreferredSize(d);spinnerRight.setMaximumSize(d);
+
+        spinnerTop.setAlignmentX(TOP_ALIGNMENT);
+        spinnerBottom.setAlignmentX(TOP_ALIGNMENT);
+        spinnerLeft.setAlignmentX(TOP_ALIGNMENT);
+        spinnerRight.setAlignmentX(TOP_ALIGNMENT);
+        widgetJPanel.add(lTop);
+        widgetJPanel.add(spinnerTop);
+        widgetJPanel.add(lBottom);
+        widgetJPanel.add(spinnerBottom);
+        widgetJPanel.add(lLeft);
+        widgetJPanel.add(spinnerLeft);
+        widgetJPanel.add(lRight);
+        widgetJPanel.add(spinnerRight);
+        spinnerTop.show(false);spinnerBottom.show(false);
+        spinnerLeft.show(false);spinnerRight.show(false);
+        lTop.show(false);lBottom.show(false);
+        lLeft.show(false);lRight.show(false);
+        widgetJPanel.add(cropButtonOK);
+        cropButtonOK.show(false);
+        
+
         
 
 //        slider.show(false);
@@ -421,6 +504,12 @@ public class DrawFrame extends JFrame
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
                 brightnessButtonOKActionPerformed(evt);
+            }
+        });
+        cropButtonOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                panel.setTextBoxesInvisible();
+                croppButtonOKActionPerformed(evt);
             }
         });
         
@@ -502,11 +591,73 @@ public class DrawFrame extends JFrame
             int value = brightnessSlider.getValue();
             brightnessSliderText.setText("Value: " + value);
         }
-    });
+       });
+       
+       
+        spinnerTop.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                int x = img.getWidth();
+                int y = img.getHeight();
+                int top = (y * ((Integer)spinnerTop.getValue())/100);
+                int bottom = (y * ((Integer)spinnerBottom.getValue())/100);
+                int left = (x * ((Integer)spinnerLeft.getValue())/100);
+                int right = (x * ((Integer)spinnerRight.getValue())/100);
+                upImg = deepCopy(img);
+                ImageTools.cropView(upImg, top, bottom, left, right);
+                panel.importImage(new ImageIcon(upImg).getImage());
+                validate();
+                repaint();
+            }
+        });
+        spinnerBottom.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                int x = img.getWidth();
+                int y = img.getHeight();
+                int top = (y * ((Integer)spinnerTop.getValue())/100);
+                int bottom = (y * ((Integer)spinnerBottom.getValue())/100);
+                int left = (x * ((Integer)spinnerLeft.getValue())/100);
+                int right = (x * ((Integer)spinnerRight.getValue())/100);
+                upImg = deepCopy(img);
+                ImageTools.cropView(upImg, top, bottom, left, right);
+                panel.importImage(new ImageIcon(upImg).getImage());
+                validate();
+                repaint();
+            }
+        });
+        spinnerLeft.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                int x = img.getWidth();
+                int y = img.getHeight();
+                int top = (y * ((Integer)spinnerTop.getValue())/100);
+                int bottom = (y * ((Integer)spinnerBottom.getValue())/100);
+                int left = (x * ((Integer)spinnerLeft.getValue())/100);
+                int right = (x * ((Integer)spinnerRight.getValue())/100);
+                upImg = deepCopy(img);
+                ImageTools.cropView(upImg, top, bottom, left, right);
+                panel.importImage(new ImageIcon(upImg).getImage());
+                validate();
+                repaint();
+            }
+        });
+        spinnerRight.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                int x = img.getWidth();
+                int y = img.getHeight();
+                int top = (y * ((Integer)spinnerTop.getValue())/100);
+                int bottom = (y * ((Integer)spinnerBottom.getValue())/100);
+                int left = (x * ((Integer)spinnerLeft.getValue())/100);
+                int right = (x * ((Integer)spinnerRight.getValue())/100);
+                upImg = deepCopy(img);
+                ImageTools.cropView(upImg, top, bottom, left, right);
+                panel.importImage(new ImageIcon(upImg).getImage());
+                validate();
+                repaint();
+            }
+        });
        
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         setSize( 700, 880 );
-        setMinimumSize(new Dimension(700, 800));
+        setMinimumSize(new Dimension(700, 880));
         setVisible( true );
         
     this.addWindowFocusListener(new WindowAdapter() {
@@ -539,7 +690,8 @@ public class DrawFrame extends JFrame
     private void brightnessButtonActionPerformed(java.awt.event.ActionEvent evt) { 
 
 
-           if (!brightnessSlider.isShowing() || contrastOn) {
+           if (!brightnessSlider.isShowing() || contrastOn || cropOn) {
+            turnOffCropLabels();
             brightnessSlider.setMinimum(-100);
             brightnessSlider.setMaximum(100);
             brightnessSlider.setValue(0);
@@ -548,6 +700,7 @@ public class DrawFrame extends JFrame
             brightnessButtonOK.setVisible(true);              
             brightnessOn = true;
             contrastOn = false;
+            cropOn = false;
           }
           else { 
             brightnessSlider.setVisible(false);
@@ -575,7 +728,8 @@ public class DrawFrame extends JFrame
     
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {   
         
-           if (!brightnessSlider.isShowing() || brightnessOn) {
+           if (!brightnessSlider.isShowing() || brightnessOn || cropOn) {
+            turnOffCropLabels();
             brightnessSlider.setMinimum(-100);
             brightnessSlider.setMaximum(100);
             brightnessSlider.setValue(0);
@@ -584,6 +738,7 @@ public class DrawFrame extends JFrame
             brightnessButtonOK.setVisible(true);              
             contrastOn = true;
             brightnessOn = false;
+            cropOn = false;
           }
           else { 
             brightnessSlider.setVisible(false);
@@ -619,12 +774,43 @@ public class DrawFrame extends JFrame
         }
     }  
     
-    private void cropButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-      
-      img = img.getSubimage(100, 100, 200, 500);
-      panel.importImage(new ImageIcon(img).getImage());
-      validate();
-      repaint();
+    private void cropButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        if (cropOn) {
+            cropOn = false;
+            turnOffCropLabels();
+        }
+        else if (!cropOn || brightnessOn || contrastOn) {
+            brightnessOn = false;
+            brightnessSlider.setVisible(false);
+            brightnessSliderText.setVisible(false);
+            brightnessButtonOK.setVisible(false);  
+            contrastOn = false;
+            turnOnCropLabels();
+            cropOn = true;
+        }
+    }
+    private void croppButtonOKActionPerformed(ActionEvent evt) {
+        int x = img.getWidth();
+        int y = img.getHeight();
+        int top = (y * ((Integer)spinnerTop.getValue())/100);
+        int bottom = (y * ((Integer)spinnerBottom.getValue())/100);
+        int left = (x * ((Integer)spinnerLeft.getValue())/100);
+        int right = (x * ((Integer)spinnerRight.getValue())/100);
+        
+        if ((x-left-right < 0) && (y-top-bottom < 0))
+            img = img.getSubimage(left+(x-left-right), top+(y-top-bottom), abs(x-left-right), abs(y-top-bottom));
+        else if (x-left-right < 0)
+            img = img.getSubimage(left+(x-left-right), top, abs(x-left-right), y-top-bottom);
+        else if (y-top-bottom < 0)
+            img = img.getSubimage(left, top+(y-top-bottom), x-left-right, abs(y-top-bottom));
+        else
+           img = img.getSubimage(left, top, x-left-right, y-top-bottom); 
+        panel.importImage(new ImageIcon(img).getImage());
+        validate();
+        repaint();
+        turnOffCropLabels();
+        cropOn = false;
+        
     }
     
     private void textButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
@@ -844,5 +1030,45 @@ public class DrawFrame extends JFrame
     public void addLabel(JLabel label) {
         panel.add(label);
     }
+    
+    static protected JSpinner addLabeledSpinner(Container c, String label, SpinnerModel model) {
+        JLabel l = new JLabel(label);
+        c.add(l);
+
+        JSpinner spinner = new JSpinner(model);
+        l.setLabelFor(spinner);
+        c.add(spinner);
+
+        return spinner;
+    }
+    public void turnOnCropLabels() {
+        spinnerTop.setValue(new Integer(0));
+        spinnerBottom.setValue(new Integer(0));
+        spinnerLeft.setValue(new Integer(0));
+        spinnerRight.setValue(new Integer(0));
+        spinnerTop.setVisible(true);spinnerBottom.setVisible(true);
+        spinnerLeft.setVisible(true);spinnerRight.setVisible(true);
+        lTop.setVisible(true);lBottom.setVisible(true);
+        lLeft.setVisible(true);lRight.setVisible(true);
+        cropButtonOK.setVisible(true);
+    }
+    public void turnOffCropLabels() {
+        
+        spinnerTop.setVisible(false);spinnerBottom.setVisible(false);
+        spinnerLeft.setVisible(false);spinnerRight.setVisible(false);
+        lTop.setVisible(false);lBottom.setVisible(false);
+        lLeft.setVisible(false);lRight.setVisible(false);
+        cropButtonOK.setVisible(false);
+        panel.importImage(new ImageIcon(img).getImage());
+        validate();
+        repaint();
+    }
+    
+    static BufferedImage deepCopy(BufferedImage bi) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+    return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+}
     
 } // end class DrawFrame
