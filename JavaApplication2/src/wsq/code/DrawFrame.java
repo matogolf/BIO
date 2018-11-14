@@ -773,7 +773,7 @@ public class DrawFrame extends JFrame
     }
     
     private void triangleButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        panel.setCurrentShapeType(3);
+        panel.setCurrentShapeType(3);         
     }
     
     private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 

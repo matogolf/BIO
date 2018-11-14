@@ -126,18 +126,23 @@ public class DrawPanel extends JPanel
         if (img != null) {
            g2 = (Graphics2D) img.getGraphics();
         } 
+//        g2 = (Graphics2D) g;
                 
         g.drawImage(img, 0, 0, null); 
         //g.drawImage(myImage, 0, 0, this);
         
         // draw the shapes
-        ArrayList<MyShape> shapeArray=myShapes.getArray();
-        for ( int counter=shapeArray.size()-1; counter>=0; counter-- )
-           shapeArray.get(counter).draw(g2);
+//        ArrayList<MyShape> shapeArray=myShapes.getArray();
+//        for ( int counter=shapeArray.size()-1; counter>=0; counter-- ) {
+//           shapeArray.get(counter).draw(g2);        
+//           System.out.println(shapeArray.get(counter));
+//        }
         
         //draws the current Shape Object if it is not null
         if (currentShapeObject!=null)
             currentShapeObject.draw(g2);
+        
+//        img = g2;
               
     }
         
@@ -227,7 +232,7 @@ public class DrawPanel extends JPanel
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public void setImageSize(int mageWidth, int imageHeight) {
+    public void setImageSize(int imageWidth, int imageHeight) {
         
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
