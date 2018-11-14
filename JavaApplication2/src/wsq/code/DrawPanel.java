@@ -47,6 +47,7 @@ public class DrawPanel extends JPanel
     private boolean currentShapeFilled; //determine whether shape is filled or not
     private DrawFrame myFrame;
     private Image img;
+    private BufferedImage img2;
     private boolean paintNow = false;
     private int oldX, oldY, nowX, nowY;
     private int imageHeight = 0, imageWidth = 0;
@@ -121,8 +122,7 @@ public class DrawPanel extends JPanel
         
         Graphics2D g2 = null;
         super.paintComponent( g );
-
-          
+        
         if (img != null) {
            g2 = (Graphics2D) img.getGraphics();
         } 
@@ -160,7 +160,16 @@ public class DrawPanel extends JPanel
      */
     public void setCurrentShapeType(int type)
     {
-        currentShapeType=type;
+        if (type == -1) {
+
+            currentShapeType=-1;
+            currentShapeObject=null;
+            currentShapeColor=Color.BLACK;
+            currentShapeFilled=false;
+        }
+        else {
+            currentShapeType=type;
+        }
     }
     
     /**

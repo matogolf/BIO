@@ -35,6 +35,8 @@ import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.abs;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -83,6 +85,7 @@ public class DrawFrame extends JFrame
     public boolean brightnessOn = false; 
     public boolean contrastOn = false;
     public boolean cropOn = false;
+    public boolean drawPenOn = false;
     
     private JButton undo; // button to undo last drawn shape
     private JButton redo; // button to redo an undo
@@ -91,6 +94,9 @@ public class DrawFrame extends JFrame
     private BufferedImage img = null;   // obrazok ktory sa zobrazuje
     private BufferedImage upImg = null; // updateovany obrazok ktory sa zobrazuje pri live nahlaade
     private BufferedImage defaultImg = null; // pre clear button - povodny obrazok
+    private BufferedImage drawImg = null; // ulozime povodny img aby sa dal vratit ak nepotvrdime zmeny
+    private BufferedImage redoImg = null;
+    private ArrayList<BufferedImage> undoArr;
 
     
     private JComboBox colors; //combobox with color options
@@ -174,7 +180,7 @@ public class DrawFrame extends JFrame
         super("Brutal BIO WSQ Editor v2.0.1!"); //sets the name of DrawFrame
         
         JLabel statusLabel = new JLabel( "" ); //create JLabel object to pass into DrawPanel
-        
+        undoArr = new ArrayList<BufferedImage>();
             
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenWidth = (int) screenSize.getWidth();
@@ -311,7 +317,7 @@ public class DrawFrame extends JFrame
         menu1.add(importBitmap);
         
         JMenuItem saveAs = new JMenuItem("Save as...");
-        saveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        saveAs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         saveAs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 panel.setTextBoxesInvisible();
@@ -703,6 +709,8 @@ public class DrawFrame extends JFrame
     }
     
     private void brightnessButtonActionPerformed(java.awt.event.ActionEvent evt) { 
+        if (drawPenOn)
+            penTurnOff(true);
 
 
            if (!brightnessSlider.isShowing() || contrastOn || cropOn) {
@@ -738,10 +746,14 @@ public class DrawFrame extends JFrame
         contrastOn = false;
         brightnessSlider.setValue(0);
         img = upImg;
+        undoArr.add(deepCopy(img));
+        redoImg = img;
     }
     
     
     private void contrastButtonActionPerformed(java.awt.event.ActionEvent evt) {   
+        if (drawPenOn)
+            penTurnOff(true);
         
            if (!brightnessSlider.isShowing() || brightnessOn || cropOn) {
             turnOffCropLabels();
@@ -776,7 +788,9 @@ public class DrawFrame extends JFrame
         panel.setCurrentShapeType(3);         
     }
     
-    private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+    private void rotateButtonActionPerformed(java.awt.event.ActionEvent evt) {          
+        if (drawPenOn)
+            penTurnOff(true);
 //        img = ImageTools.rotate(img);
         if (img != null) {
             img = ImageTools.rotate(img);
@@ -786,10 +800,18 @@ public class DrawFrame extends JFrame
             panel.redrawTextPoints();
             validate();
             repaint();
+            undoArr.add(deepCopy(img));
+            redoImg = img;
         }
     }  
     
     private void cropButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        if (drawPenOn) {
+            penTurnOff(true);
+
+        }
+            
+
         if (cropOn) {
             cropOn = false;
             turnOffCropLabels();
@@ -805,6 +827,7 @@ public class DrawFrame extends JFrame
         }
     }
     private void croppButtonOKActionPerformed(ActionEvent evt) {
+
         int x = img.getWidth();
         int y = img.getHeight();
         int top = (y * ((Integer)spinnerTop.getValue())/100);
@@ -820,19 +843,28 @@ public class DrawFrame extends JFrame
             img = img.getSubimage(left, top+(y-top-bottom), x-left-right, abs(y-top-bottom));
         else
            img = img.getSubimage(left, top, x-left-right, y-top-bottom); 
+        
         panel.importImage(new ImageIcon(img).getImage());
         validate();
         repaint();
         turnOffCropLabels();
         cropOn = false;
+        undoArr.add(deepCopy(img));
+        redoImg = img;
+
         
     }
     
-    private void textButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+    private void textButtonActionPerformed(java.awt.event.ActionEvent evt) {    
+        if (drawPenOn)
+            penTurnOff(true);
         panel.setCurrentShapeType(4);
     }
     
     private void zoomPlusButtonActionPerformed(java.awt.event.ActionEvent evt) { 
+        if (drawPenOn)
+            penTurnOff(true);
+        
         if (img != null) {
             img = ImageTools.zoomIn(img);
             
@@ -841,10 +873,15 @@ public class DrawFrame extends JFrame
             panel.redrawTextPoints();
             validate();
             repaint();
+            undoArr.add(deepCopy(img));
+            redoImg = img;
         }            
     }
     
-    private void zoomMinusButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
+    private void zoomMinusButtonActionPerformed(java.awt.event.ActionEvent evt) {   
+        if (drawPenOn)
+            penTurnOff(true);
+        
         if (img != null) {
             img = ImageTools.zoomOut(img);
             
@@ -853,11 +890,20 @@ public class DrawFrame extends JFrame
             panel.redrawTextPoints();
             validate();
             repaint();
+            undoArr.add(deepCopy(img));
+            redoImg = img;
         } 
     }
     
-    private void drawingButtonActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        panel.setCurrentShapeType(1);
+    private void drawingButtonActionPerformed(java.awt.event.ActionEvent evt) {    
+        if (drawPenOn) {
+            penTurnOff(false);
+        }
+        else {
+            penTurnOn();
+            panel.setCurrentShapeType(1);   
+        }
+
     }
     
     private void importBitmapActionPerformed(ActionEvent evt) {
@@ -880,6 +926,10 @@ public class DrawFrame extends JFrame
             panel.importImage(new javax.swing.ImageIcon(img).getImage());            
             validate();
             repaint();
+            undoArr.clear();
+            undoArr.add(deepCopy(img));
+            undoArr.add(deepCopy(img));
+            redoImg = img;
         } catch (IOException ex) {
             Logger.getLogger(DrawFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -940,14 +990,29 @@ public class DrawFrame extends JFrame
         public void actionPerformed( ActionEvent event )
         {
             if (event.getSource() == undo){
-                panel.clearLastShape();
+              
+//                panel.clearLastShape();
+                img = undoAction();
+                panel.importImage(new javax.swing.ImageIcon(img).getImage());            
+                validate();
+                repaint();
+                
+                
             }
             else if (event.getSource() == redo){
-                panel.redoLastShape();
+//                panel.redoLastShape();
+                if (img != redoImg) {
+                    img = redoImg;
+                    undoArr.add(deepCopy(img));
+                    panel.importImage(new javax.swing.ImageIcon(img).getImage());            
+                    validate();
+                    repaint();
+                }
+                
             }
             // clear button - reset img
             else if (event.getSource() == clear){
-                panel.clearDrawing();
+//                panel.clearDrawing();
                 Dimension newImgSize = ImageTools.getScaledDimension(defaultImg.getWidth(), defaultImg.getHeight(), xBoundery, yBoundery);
                 int x = (int) newImgSize.getWidth();
                 int y = (int) newImgSize.getHeight();
@@ -956,9 +1021,14 @@ public class DrawFrame extends JFrame
                 panel.importImage(new javax.swing.ImageIcon(defaultImg).getImage());            
                 validate();
                 repaint();
+                undoArr.clear();
+                undoArr.add(deepCopy(defaultImg));
+                redoImg = defaultImg;
+                img = defaultImg;
             }
              
         } // end method actionPerformed
+
     } // end private inner class ButtonHandler
     
     /**
@@ -1021,6 +1091,10 @@ public class DrawFrame extends JFrame
             panel.importImage(new javax.swing.ImageIcon(img).getImage());            
             validate();
             repaint();
+            undoArr.clear();
+            undoArr.add(deepCopy(img));
+            undoArr.add(deepCopy(img));
+            redoImg = img;
         
         } catch (IOException ex) {
             Logger.getLogger(DrawFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -1123,7 +1197,37 @@ public class DrawFrame extends JFrame
         ColorModel cm = bi.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
         WritableRaster raster = bi.copyData(null);
-    return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-}
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
+    
+    public void penTurnOn() {
+        drawImg = deepCopy(img);
+               
+        drawPenOn = true;
+        drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantLinePressed.png")));
+    }
+    public void penTurnOff(boolean forget) {
+        panel.setCurrentShapeType(-1);
+        drawPenOn = false;
+        
+        if (forget) {
+            img = drawImg;
+            panel.importImage(new ImageIcon(img).getImage());
+            validate();
+            repaint();  
+        }
+        else {
+            undoArr.add(deepCopy(drawImg));
+            undoArr.add(deepCopy(img));
+        }
+        drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantLine.png")));
+    }
+    
+    private BufferedImage undoAction() {
+        BufferedImage undoImg = undoArr.get(undoArr.size()-2);
+        redoImg =  undoArr.get(undoArr.size()-1);
+        undoArr.remove(undoArr.size()-1);
+        return undoImg;
+    }
     
 } // end class DrawFrame
