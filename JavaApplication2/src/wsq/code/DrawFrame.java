@@ -34,11 +34,16 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import static java.lang.Math.abs;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Window;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -56,6 +61,8 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import org.jnbis.api.Jnbis;
 
@@ -72,6 +79,8 @@ import org.jnbis.api.Jnbis;
 public class DrawFrame extends JFrame
 {  
     private static String WSQ_FILE_NAME;
+    private String FILE_NAME;
+    
     private JLabel stausLabel; //label display mouse coordinates
     private DrawPanel panel; //draw panel for the shapes
     private int screenWidth;            //velkost obrazovky uzivatela
@@ -97,6 +106,7 @@ public class DrawFrame extends JFrame
     private BufferedImage drawImg = null; // ulozime povodny img aby sa dal vratit ak nepotvrdime zmeny
     private BufferedImage redoImg = null;
     private ArrayList<BufferedImage> undoArr;
+    
 
     
     private JComboBox colors; //combobox with color options
@@ -342,7 +352,7 @@ public class DrawFrame extends JFrame
          */
         JMenu menu2 = new JMenu("Tools");
         
-        JMenu menu3 = new JMenu("Convert WSQ to other formats...");
+        JMenu menu3 = new JMenu("Convert multiply WSQ to other formats...");
         JMenuItem ConvertWSQtoOther = new JMenuItem("Convert WSQ to other formats...");
         ConvertWSQtoOther.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
         menu2.add(menu3); 
@@ -370,7 +380,7 @@ public class DrawFrame extends JFrame
         /**
          * Second Tools sub menu
          */        
-        JMenuItem ConvertWSQtoJPG = new JMenuItem("Convert WSQ to JPG...");
+        JMenuItem ConvertWSQtoJPG = new JMenuItem("Convert multiply WSQ files to JPG...");
         ConvertWSQtoJPG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoJPG.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -380,7 +390,7 @@ public class DrawFrame extends JFrame
         });
         menu3.add(ConvertWSQtoJPG); 
         
-        JMenuItem ConvertWSQtoGIF = new JMenuItem("Convert WSQ to GIF...");
+        JMenuItem ConvertWSQtoGIF = new JMenuItem("Convert multiply WSQ files to GIF...");
         ConvertWSQtoGIF.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoGIF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -390,7 +400,7 @@ public class DrawFrame extends JFrame
         });
         menu3.add(ConvertWSQtoGIF);
     
-        JMenuItem ConvertWSQtoPNG = new JMenuItem("Convert WSQ to PNG...");
+        JMenuItem ConvertWSQtoPNG = new JMenuItem("Convert multiply WSQ files to PNG...");
         ConvertWSQtoPNG.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         ConvertWSQtoPNG.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -935,8 +945,23 @@ public class DrawFrame extends JFrame
         }
     }
     
-    private void saveFileAsPerformed(ActionEvent evt) {
+    private void saveFileAsPerformed(ActionEvent evt) {       
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        
+        //
+        // disable the "All files" option.
+        //
+        jfc.setAcceptAllFileFilterUsed(false);        
+         jfc.addChoosableFileFilter(new FileNameExtensionFilter("JPEG (.jpg)", "jpg"));
+         jfc.addChoosableFileFilter(new FileNameExtensionFilter("GIF (.gif)", "gif"));
+         jfc.addChoosableFileFilter(new FileNameExtensionFilter("PNG (.png)", "png"));
+
+         // set default type
+         jfc.setFileFilter(jfc.getChoosableFileFilters()[0]);
+
+         // set default file
+//         jfc().setSelectedFile(img);        
+        
         jfc.setDialogTitle("Choose a directory to save your file: ");
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
@@ -950,9 +975,10 @@ public class DrawFrame extends JFrame
         try {
 //            Image img_new = panel.getImage();
 //            System.out.println(img_new);
-            System.out.println(img);            
-            File outputfile = new File(jfc.getSelectedFile()+"/saved.jpg");
-            ImageIO.write((RenderedImage) img, "jpg", outputfile);
+//            System.out.println(img);       
+            File outputfile = new File(jfc.getSelectedFile().getCanonicalPath() + "." + ((FileNameExtensionFilter) jfc.getFileFilter()).getExtensions()[0]);
+//            File outputfile = new File(jfc.getSelectedFile()+"/saved.jpg");
+            ImageIO.write(defaultImg, "jpg", outputfile);
         } catch (IOException e) {
             // handle exception
         }        
@@ -1074,6 +1100,7 @@ public class DrawFrame extends JFrame
         String filepath = directory+f.getFile();
 
         WSQ_FILE_NAME = filepath;
+        
         byte[] jpgArray;
         jpgArray = Jnbis.wsq().decode(WSQ_FILE_NAME).toJpg().asByteArray();
         
@@ -1103,57 +1130,141 @@ public class DrawFrame extends JFrame
     }
     
     private void ConvertWSQtoPNGPerformed(ActionEvent evt) {
-        FileDialog f = new FileDialog(this, "Choose WSQ File ", FileDialog.LOAD);
-        String directory = null;
-        f.setDirectory(directory);
-        f.show();
-        directory = f.getDirectory();
-        String filepath = directory+f.getFile();
+    
+        JFileChooser chooser;
 
-        WSQ_FILE_NAME = filepath;
+        chooser = new JFileChooser(); 
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Choose directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //
+        // disable the "All files" option.
+        //
+        chooser.setAcceptAllFileFilterUsed(false);
 
-        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".png";
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
+          System.out.println("getCurrentDirectory(): " 
+             +  chooser.getCurrentDirectory());
+          System.out.println("getSelectedFile() : " 
+             +  chooser.getSelectedFile());
+        } else {
+          System.out.println("No Selection ");
+        }
+               
+        File folder = chooser.getSelectedFile();
+         
+        String[] files = folder.list();
+         
+        for (String file : files) 
+        {
+            System.out.println(file);
+            String fullpath = folder+"/"+file;
+            System.out.println("fullpath: " + fullpath);
+
+            String newFilePath = fullpath.substring(0, fullpath.length()-".wsq".length())+".png";
+
+            File png = Jnbis.wsq()
+                    .decode(fullpath)
+                    .toPng()
+                    .asFile(newFilePath);                
+        }
         
-        File png = Jnbis.wsq()
-                .decode(WSQ_FILE_NAME)
-                .toPng()
-                .asFile(newFilePath);             
+        JOptionPane.showMessageDialog(panel,
+            "All done",
+            "Convertor",
+            JOptionPane.WARNING_MESSAGE);        
     }    
     
     private void ConvertWSQtoJPGPerformed(ActionEvent evt) {
-        FileDialog f = new FileDialog(this, "Choose WSQ File ", FileDialog.LOAD);
-        String directory = null;
-        f.setDirectory(directory);
-        f.show();
-        directory = f.getDirectory();
-        String filepath = directory+f.getFile();
+        JFileChooser chooser;
 
-        WSQ_FILE_NAME = filepath;
+        chooser = new JFileChooser(); 
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Choose directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //
+        // disable the "All files" option.
+        //
+        chooser.setAcceptAllFileFilterUsed(false);
 
-        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".jpg";
-        
-        File jpg = Jnbis.wsq()
-                .decode(WSQ_FILE_NAME)
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
+          System.out.println("getCurrentDirectory(): " 
+             +  chooser.getCurrentDirectory());
+          System.out.println("getSelectedFile() : " 
+             +  chooser.getSelectedFile());
+        } else {
+          System.out.println("No Selection ");
+        }
+               
+        File folder = chooser.getSelectedFile();
+         
+        String[] files = folder.list();
+         
+        for (String file : files) 
+        {
+            System.out.println(file);
+            String fullpath = folder+"/"+file;
+            System.out.println("fullpath: " + fullpath);
+
+            String newFilePath = fullpath.substring(0, fullpath.length()-".wsq".length())+".jpg";
+
+            File jpg = Jnbis.wsq()
+                .decode(fullpath)
                 .toJpg()
-                .asFile(newFilePath);             
+                .asFile(newFilePath);                 
+        }
+        
+        JOptionPane.showMessageDialog(panel,
+            "All done",
+            "Convertor",
+            JOptionPane.WARNING_MESSAGE);            
+    
     } 
 
     private void ConvertWSQtoGIFPerformed(ActionEvent evt) {
-        FileDialog f = new FileDialog(this, "Choose WSQ File ", FileDialog.LOAD);
-        String directory = null;
-        f.setDirectory(directory);
-        f.show();
-        directory = f.getDirectory();
-        String filepath = directory+f.getFile();
+        JFileChooser chooser;
 
-        WSQ_FILE_NAME = filepath;
+        chooser = new JFileChooser(); 
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Choose directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //
+        // disable the "All files" option.
+        //
+        chooser.setAcceptAllFileFilterUsed(false);
 
-        String newFilePath = WSQ_FILE_NAME.substring(0, WSQ_FILE_NAME.length()-".wsq".length())+".gif";
-        
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
+          System.out.println("getCurrentDirectory(): " 
+             +  chooser.getCurrentDirectory());
+          System.out.println("getSelectedFile() : " 
+             +  chooser.getSelectedFile());
+        } else {
+          System.out.println("No Selection ");
+        }
+               
+        File folder = chooser.getSelectedFile();
+         
+        String[] files = folder.list();
+         
+        for (String file : files) 
+        {
+            System.out.println(file);
+            String fullpath = folder+"/"+file;
+            System.out.println("fullpath: " + fullpath);
+
+            String newFilePath = fullpath.substring(0, fullpath.length()-".wsq".length())+".gif";
+
         File gif = Jnbis.wsq()
-                .decode(WSQ_FILE_NAME)
+                .decode(fullpath)
                 .toGif()
-                .asFile(newFilePath);             
+                .asFile(newFilePath);                  
+        }
+        
+        JOptionPane.showMessageDialog(panel,
+            "All done",
+            "Convertor",
+            JOptionPane.WARNING_MESSAGE);           
+         
     }     
     
     public void addLabel(JLabel label) {

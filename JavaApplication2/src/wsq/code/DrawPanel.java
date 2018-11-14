@@ -1,5 +1,6 @@
 package wsq.code;
 
+import com.mortennobel.imagescaling.ResampleOp;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;
@@ -13,11 +14,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import net.java.balloontip.BalloonTip;
 import net.java.balloontip.styles.BalloonTipStyle;
@@ -52,7 +58,10 @@ public class DrawPanel extends JPanel
     private int oldX, oldY, nowX, nowY;
     private int imageHeight = 0, imageWidth = 0;
     private List<BalloonPoint> textBoxes;
-    
+    private float scale = 1;
+    private double zoom = 1.0;  // zoom factor 
+    private double zoom_x = 0;
+    private double zoom_y = 0;
     
     JLabel statusLabel; //status label for mouse coordinates
     
@@ -84,6 +93,7 @@ public class DrawPanel extends JPanel
         
         // event handling for mouse and mouse motion events
         MouseHandler handler = new MouseHandler();                                    
+        addMouseWheelListener( handler );        
         addMouseListener( handler );
         addMouseMotionListener( handler ); 
         MyKeyListener keyListener = new MyKeyListener();
@@ -247,6 +257,8 @@ public class DrawPanel extends JPanel
         this.imageHeight = imageHeight;
     }
     
+    
+    
     /**
      * Private inner class that implements MouseAdapter and does event handling for mouse events.
      */
@@ -258,7 +270,8 @@ public class DrawPanel extends JPanel
          */
         public void mousePressed( MouseEvent event )
         {
-            
+            System.out.println("Mouse pressssssssssssed");
+
             setTextBoxesInvisible();
 
             if (currentShapeType == 1) 
@@ -339,6 +352,7 @@ public class DrawPanel extends JPanel
             
         } // end method mouseReleased
         
+     
         /**
          * This method gets the mouse pos when it is moving and sets it to statusLabel.
          */
@@ -347,6 +361,8 @@ public class DrawPanel extends JPanel
             
             int x = event.getX();
             int y = event.getY();
+            zoom_x = x;
+            zoom_y = y;
             
             if (currentShapeType == 3 && currentShapeObject != null){
                 if (currentShapeObject.getClickcount() == 1) {
@@ -399,8 +415,54 @@ public class DrawPanel extends JPanel
             
         } // end method mouseDragged
         
+        @Override        
+        public void mouseWheelMoved(MouseWheelEvent e) {
+                    System.out.println("mouseeeeeeeeeeeee");
+                int notches = e.getWheelRotation();
+                double temp = zoom - (notches * 0.2);
+                // minimum zoom factor is 1.0
+                temp = Math.max(temp, 1.0);
+                if (temp != zoom) {
+                    zoom = temp;
+                    resizeImage();
+                }                    
+//                    double delta = 0.05f * e.getPreciseWheelRotation();
+//                    scale += delta;
+//                    revalidate();
+//                    repaint();            
+//            if (e.isControlDown()) {
+//                if (e.getWheelRotation() < 0) {
+//                    System.out.println("mouse wheel Up");
+//                } else {
+//                    System.out.println("mouse wheel Down");
+//                }
+//            } else {
+//                // pass the event on to the scroll pane
+//                getParent().dispatchEvent(e);
+//            }
+        }     
+        
     }// end MouseHandler
-    
+       
+    public void resizeImage() {
+        
+      
+           System.out.println(zoom);
+           System.out.println(zoom_x);
+           System.out.println(zoom_y);
+          
+//    BufferedImage dbi = (BufferedImage) img;
+//    if(dbi != null) {
+//        dbi = new BufferedImage( img.getHeight(myFrame), img.getWidth(myFrame), BufferedImage.TYPE_INT_ARGB);
+//        Graphics2D g = dbi.createGraphics();
+//        AffineTransform at = AffineTransform.getScaleInstance(zoom_x, zoom_y);
+//        g.drawRenderedImage(dbi, at);
+//    }
+//    img = dbi;
+//            repaint();
+
+
+        }    
     
     public class MyKeyListener implements KeyListener {
         
