@@ -1,6 +1,5 @@
 package wsq.code;
 
-import com.mortennobel.imagescaling.ResampleOp;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;
@@ -53,7 +52,7 @@ public class DrawPanel extends JPanel
     private boolean currentShapeFilled; //determine whether shape is filled or not
     private DrawFrame myFrame;
     private Image img;
-    private BufferedImage img2;
+    private Image img2;
     private boolean paintNow = false;
     private int oldX, oldY, nowX, nowY;
     private int imageHeight = 0, imageWidth = 0;
@@ -104,7 +103,24 @@ public class DrawPanel extends JPanel
     /**
      * Calls the draw method for the existing shapes.
      */
-    
+    public static BufferedImage toBufferedImage(Image img)
+    {
+        if (img instanceof BufferedImage)
+        {
+            return (BufferedImage) img;
+        }
+
+        // Create a buffered image with transparency
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the image on to the buffered image
+        Graphics2D bGr = bimage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+
+        // Return the buffered image
+        return bimage;
+    }    
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 //    public void paintComponent( Graphics g )
 //    {
@@ -126,38 +142,69 @@ public class DrawPanel extends JPanel
 //            currentShapeObject.draw(g2);
 //        
 //    }
-//%%%%%%%%55 @Timo First or Second    
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     public void paintComponent( Graphics g )
     {
-        
-        Graphics2D g2 = null;
-        super.paintComponent( g );
-        
+        Graphics2D g2d = null;
+            super.paintComponent(g);
+//            Graphics2D g2d = (Graphics2D) g.create();
+//           g2d = (Graphics2D) img.getGraphics();
+
         if (img != null) {
-           g2 = (Graphics2D) img.getGraphics();
-        } 
-//        g2 = (Graphics2D) g;
-                
-        g.drawImage(img, 0, 0, null); 
-        //g.drawImage(myImage, 0, 0, this);
+           g2d = (Graphics2D) img.getGraphics();
+        }             
+            g2d = (Graphics2D) g.create();
+           
+            double width = getWidth();
+            double height = getHeight();
+
+            double zoomWidth = width * zoom;
+            double zoomHeight = height * zoom;
+
+            double anchorx = (width - zoomWidth) / 1.5;
+            double anchory = (height - zoomHeight) / 1.5;
+
+            AffineTransform at = new AffineTransform();
+            at.translate(anchorx, anchory);
+            at.scale(zoom, zoom);
+            at.translate(0, 0);
+
+            g2d.setTransform(at);
+            g2d.drawImage(img, 0, 0, null);
+
+        ArrayList<MyShape> shapeArray=myShapes.getArray();
+        for ( int counter=shapeArray.size()-1; counter>=0; counter-- )
+           shapeArray.get(counter).draw(g2d);       
         
-        // draw the shapes
-//        ArrayList<MyShape> shapeArray=myShapes.getArray();
-//        for ( int counter=shapeArray.size()-1; counter>=0; counter-- ) {
-//           shapeArray.get(counter).draw(g2);        
-//           System.out.println(shapeArray.get(counter));
-//        }
-        
-        //draws the current Shape Object if it is not null
         if (currentShapeObject!=null)
-            currentShapeObject.draw(g2);
-        
-//        img = g2;
-              
-    }
+            currentShapeObject.draw(g2d);  
+
+    }    
+//    public void paintComponent( Graphics g )
+//    {
+//        
+//        Graphics2D g2 = null;
+//
+//        super.paintComponent( g );
+//        
+//
+//        if (img != null) {
+//           g2 = (Graphics2D) img.getGraphics();
+//        } 
+//
+//            g.drawImage(img, 0, 0, null); 
+////        ArrayList<MyShape> shapeArray=myShapes.getArray();
+////        for ( int counter=shapeArray.size()-1; counter>=0; counter-- )
+////           shapeArray.get(counter).draw(g2);         
+//        //draws the current Shape Object if it is not null
+//        if (currentShapeObject!=null)
+//            currentShapeObject.draw(g2);
+//
+//              
+//    }    
         
     public Image getImage() {
-        return img;
+        return toBufferedImage(img);
     }
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     
@@ -426,42 +473,17 @@ public class DrawPanel extends JPanel
                     zoom = temp;
                     resizeImage();
                 }                    
-//                    double delta = 0.05f * e.getPreciseWheelRotation();
-//                    scale += delta;
-//                    revalidate();
-//                    repaint();            
-//            if (e.isControlDown()) {
-//                if (e.getWheelRotation() < 0) {
-//                    System.out.println("mouse wheel Up");
-//                } else {
-//                    System.out.println("mouse wheel Down");
-//                }
-//            } else {
-//                // pass the event on to the scroll pane
-//                getParent().dispatchEvent(e);
-//            }
+
         }     
         
     }// end MouseHandler
        
     public void resizeImage() {
-        
-      
+
            System.out.println(zoom);
            System.out.println(zoom_x);
-           System.out.println(zoom_y);
+           System.out.println(zoom_y);         
           
-//    BufferedImage dbi = (BufferedImage) img;
-//    if(dbi != null) {
-//        dbi = new BufferedImage( img.getHeight(myFrame), img.getWidth(myFrame), BufferedImage.TYPE_INT_ARGB);
-//        Graphics2D g = dbi.createGraphics();
-//        AffineTransform at = AffineTransform.getScaleInstance(zoom_x, zoom_y);
-//        g.drawRenderedImage(dbi, at);
-//    }
-//    img = dbi;
-//            repaint();
-
-
         }    
     
     public class MyKeyListener implements KeyListener {
