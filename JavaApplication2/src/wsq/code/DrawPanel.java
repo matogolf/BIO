@@ -106,19 +106,6 @@ public class DrawPanel extends JPanel
      */
     public void paintComponent( Graphics g )
     {
-        
-        Graphics2D g2 = null;
-        super.paintComponent( g );
-        
-        if (img != null) {
-           g2 = (Graphics2D) img.getGraphics();
-        } 
-                
-        g.drawImage(img, 0, 0, null); 
-
-        if (currentShapeObject!=null)
-            currentShapeObject.draw(g2);
-        
         Graphics2D g2d = null;
             super.paintComponent(g);
         if (img != null) {
@@ -149,6 +136,20 @@ public class DrawPanel extends JPanel
 
             g2d.setTransform(at);
             g2d.drawImage(img, 0, 0, null);
+        
+        Graphics2D g2 = null;
+        super.paintComponent( g );
+        
+        if (img != null) {
+           g2 = (Graphics2D) img.getGraphics();
+        } 
+                
+        g.drawImage(img, 0, 0, null); 
+
+        if (currentShapeObject!=null)
+            currentShapeObject.draw(g2);
+        
+
             
     }
         
