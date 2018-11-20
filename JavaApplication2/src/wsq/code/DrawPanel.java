@@ -1,6 +1,6 @@
 package wsq.code;
 
-import com.mortennobel.imagescaling.ResampleOp;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;
@@ -136,24 +136,38 @@ public class DrawPanel extends JPanel
         if (img != null) {
            g2 = (Graphics2D) img.getGraphics();
         } 
-//        g2 = (Graphics2D) g;
                 
         g.drawImage(img, 0, 0, null); 
-        //g.drawImage(myImage, 0, 0, this);
-        
-        // draw the shapes
-//        ArrayList<MyShape> shapeArray=myShapes.getArray();
-//        for ( int counter=shapeArray.size()-1; counter>=0; counter-- ) {
-//           shapeArray.get(counter).draw(g2);        
-//           System.out.println(shapeArray.get(counter));
-//        }
-        
-        //draws the current Shape Object if it is not null
+
         if (currentShapeObject!=null)
             currentShapeObject.draw(g2);
         
-//        img = g2;
-              
+        //ORMI
+        Graphics2D g2d = null;
+            super.paintComponent(g);
+        if (img != null) {
+           g2d = (Graphics2D) img.getGraphics();
+        }             
+            g2d = (Graphics2D) g.create();
+           
+            double width = getWidth();
+            double height = getHeight();
+
+            double zoomWidth = width * zoom;
+            double zoomHeight = height * zoom;
+
+            double anchorx = (width - zoomWidth) / 1.5;
+            double anchory = (height - zoomHeight) / 1.5;
+
+            AffineTransform at = new AffineTransform();
+            at.translate(anchorx, anchory);
+            at.scale(zoom, zoom);
+            at.translate(0, 0);
+
+            g2d.setTransform(at);
+            g2d.drawImage(img, 0, 0, null);
+        //ORMI END
+            
     }
         
     public Image getImage() {
@@ -426,20 +440,7 @@ public class DrawPanel extends JPanel
                     zoom = temp;
                     resizeImage();
                 }                    
-//                    double delta = 0.05f * e.getPreciseWheelRotation();
-//                    scale += delta;
-//                    revalidate();
-//                    repaint();            
-//            if (e.isControlDown()) {
-//                if (e.getWheelRotation() < 0) {
-//                    System.out.println("mouse wheel Up");
-//                } else {
-//                    System.out.println("mouse wheel Down");
-//                }
-//            } else {
-//                // pass the event on to the scroll pane
-//                getParent().dispatchEvent(e);
-//            }
+                repaint();
         }     
         
     }// end MouseHandler
