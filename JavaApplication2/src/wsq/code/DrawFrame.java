@@ -221,7 +221,6 @@ public class DrawFrame extends JFrame
         modelBottom = new SpinnerNumberModel(0, 0, 100, 1);
         modelLeft = new SpinnerNumberModel(0, 0, 100, 1);
         modelRight = new SpinnerNumberModel(0, 0, 100, 1);
-//        spinnerTop = addLabeledSpinner(widgetJPanel,"Kek",modelTop);
         spinnerTop = new JSpinner(modelTop);
         spinnerBottom = new JSpinner(modelBottom);
         spinnerLeft = new JSpinner(modelLeft);
@@ -265,11 +264,6 @@ public class DrawFrame extends JFrame
         textButton.setFocusable(false);
         drawingButton.setFocusable(false);
         
-        
-//        undo.setMargin(new Insets(0, 0, 0, 0));
-//        undo.setContentAreaFilled(false);
-        //undo.setPreferredSize(new Dimension(40, 40));
-        
         //create comboboxes
         colors = new JComboBox( colorOptions );
         shapes = new JComboBox( shapeOptions );
@@ -279,9 +273,7 @@ public class DrawFrame extends JFrame
         
         //JPanel object, widgetJPanel, with grid layout for widgets
         widgetJPanel = new JPanel();
-//      widgetJPanel.setLayout( new GridLayout( 12, 1 ) ); //sets padding between widgets in gridlayout
         widgetJPanel.setLayout(new BoxLayout(widgetJPanel, BoxLayout.PAGE_AXIS));
-//      widgetJPanel.setLayout( new GridLayout( 6, 1, 0, 5 ) ); //sets padding between widgets in gridlayout
         
       
         /**
@@ -470,15 +462,7 @@ public class DrawFrame extends JFrame
         lLeft.show(false);lRight.show(false);
         widgetJPanel.add(cropButtonOK);
         cropButtonOK.show(false);
-        
 
-        
-
-//        slider.show(false);
-
-        //widgetJPanel.add( colors );
-        //widgetJPanel.add( shapes );                 
-        //widgetJPanel.add( filled );
         // add widgetJPanel to widgetPadder
         widgetPadder.add( widgetJPanel );
         
@@ -690,7 +674,6 @@ public class DrawFrame extends JFrame
             brightnessSlider.setValue(0);
             brightnessOn = false;
             contrastOn = false;
-            //panel.importImage(new ImageIcon(img).getImage());            
             validate();
             repaint();
             
@@ -905,10 +888,7 @@ public class DrawFrame extends JFrame
          jfc.addChoosableFileFilter(new FileNameExtensionFilter("PNG (.png)", "png"));
 
          // set default type
-         jfc.setFileFilter(jfc.getChoosableFileFilters()[0]);
-
-         // set default file
-//         jfc().setSelectedFile(img);        
+         jfc.setFileFilter(jfc.getChoosableFileFilters()[0]);      
         
         jfc.setDialogTitle("Choose a directory to save your file: ");
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -920,13 +900,10 @@ public class DrawFrame extends JFrame
                 }
         }
         
+        BufferedImage imgToSave = ImageTools.changeBrightness(img, 0);
         try {
-//            Image img_new = panel.getImage();
-//            System.out.println(img_new);
-//            System.out.println(img);       
             File outputfile = new File(jfc.getSelectedFile().getCanonicalPath() + "." + ((FileNameExtensionFilter) jfc.getFileFilter()).getExtensions()[0]);
-//            File outputfile = new File(jfc.getSelectedFile()+"/saved.jpg");
-            ImageIO.write(img, "jpg", outputfile);
+            ImageIO.write(imgToSave, "jpg", outputfile);
         } catch (IOException e) {
             // handle exception
         }        
@@ -964,8 +941,6 @@ public class DrawFrame extends JFrame
         public void actionPerformed( ActionEvent event )
         {
             if (event.getSource() == undo){
-              
-//                panel.clearLastShape();
                 img = undoAction();
                 panel.importImage(new javax.swing.ImageIcon(img).getImage());            
                 validate();
@@ -974,7 +949,6 @@ public class DrawFrame extends JFrame
                 
             }
             else if (event.getSource() == redo){
-//                panel.redoLastShape();
                 if (img != redoImg) {
                     img = redoImg;
                     undoArr.add(deepCopy(img));
@@ -986,7 +960,6 @@ public class DrawFrame extends JFrame
             }
             // clear button - reset img
             else if (event.getSource() == clear){
-//                panel.clearDrawing();
                 Dimension newImgSize = ImageTools.getScaledDimension(defaultImg.getWidth(), defaultImg.getHeight(), xBoundery, yBoundery);
                 int x = (int) newImgSize.getWidth();
                 int y = (int) newImgSize.getHeight();
@@ -1064,12 +1037,14 @@ public class DrawFrame extends JFrame
             panel.setImageSize(x, y);
             
             panel.importImage(new javax.swing.ImageIcon(img).getImage());            
-            validate();
-            repaint();
+
             undoArr.clear();
             undoArr.add(deepCopy(img));
             undoArr.add(deepCopy(img));
             redoImg = img;
+            
+                        validate();
+            repaint();
         
         } catch (IOException ex) {
             Logger.getLogger(DrawFrame.class.getName()).log(Level.SEVERE, null, ex);

@@ -104,29 +104,6 @@ public class DrawPanel extends JPanel
     /**
      * Calls the draw method for the existing shapes.
      */
-    
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-//    public void paintComponent( Graphics g )
-//    {
-//        
-//        Graphics2D g2 = null;
-//        super.paintComponent( g );
-//        g2 = (Graphics2D) g;
-//
-//        g.drawImage(img, 0, 0, null); 
-//        //g.drawImage(myImage, 0, 0, this);
-//        
-//        // draw the shapes
-//        ArrayList<MyShape> shapeArray=myShapes.getArray();
-//        for ( int counter=shapeArray.size()-1; counter>=0; counter-- )
-//           shapeArray.get(counter).draw(g2);
-//        
-//        //draws the current Shape Object if it is not null
-//        if (currentShapeObject!=null)
-//            currentShapeObject.draw(g2);
-//        
-//    }
-//%%%%%%%%55 @Timo First or Second    
     public void paintComponent( Graphics g )
     {
         
@@ -142,7 +119,6 @@ public class DrawPanel extends JPanel
         if (currentShapeObject!=null)
             currentShapeObject.draw(g2);
         
-        //ORMI
         Graphics2D g2d = null;
             super.paintComponent(g);
         if (img != null) {
@@ -150,33 +126,35 @@ public class DrawPanel extends JPanel
         }             
             g2d = (Graphics2D) g.create();
            
-            double width = getWidth();
-            double height = getHeight();
+            double width = zoom_x;//getWidth();
+            double height = zoom_y;//getHeight();
 
             double zoomWidth = width * zoom;
             double zoomHeight = height * zoom;
 
-            double anchorx = (width - zoomWidth) / 1.5;
-            double anchory = (height - zoomHeight) / 1.5;
+            double anchorx = (width - zoomWidth) / 1.0;
+            double anchory = (height - zoomHeight) / 1.0;
+
+            System.out.println("======");
+            System.out.println(width);
+            System.out.println(height);
+            System.out.println(zoomWidth);
+            System.out.println(zoomHeight);
+            System.out.println("======");
 
             AffineTransform at = new AffineTransform();
             at.translate(anchorx, anchory);
             at.scale(zoom, zoom);
-            at.translate(0, 0);
+            at.translate(1, 1);
 
             g2d.setTransform(at);
             g2d.drawImage(img, 0, 0, null);
-        //ORMI END
             
     }
         
     public Image getImage() {
         return img;
     }
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-    
-    
-    
     //Mutator methods for currentShapeType, currentShapeColor and currentShapeFilled
     
     /**
@@ -446,23 +424,9 @@ public class DrawPanel extends JPanel
     }// end MouseHandler
        
     public void resizeImage() {
-        
-      
            System.out.println(zoom);
            System.out.println(zoom_x);
            System.out.println(zoom_y);
-          
-//    BufferedImage dbi = (BufferedImage) img;
-//    if(dbi != null) {
-//        dbi = new BufferedImage( img.getHeight(myFrame), img.getWidth(myFrame), BufferedImage.TYPE_INT_ARGB);
-//        Graphics2D g = dbi.createGraphics();
-//        AffineTransform at = AffineTransform.getScaleInstance(zoom_x, zoom_y);
-//        g.drawRenderedImage(dbi, at);
-//    }
-//    img = dbi;
-//            repaint();
-
-
         }    
     
     public class MyKeyListener implements KeyListener {
