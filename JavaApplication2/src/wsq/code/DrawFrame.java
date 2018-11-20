@@ -151,12 +151,8 @@ public class DrawFrame extends JFrame
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
-    private javax.swing.JButton ovalButton;
-    private javax.swing.JButton triangleButton;
     private javax.swing.JButton rotateButton;
     private javax.swing.JButton textButton;
-    private javax.swing.JButton zoomMinusButton;
-    private javax.swing.JButton zoomPlusButton;
     private javax.swing.JButton drawingButton;
     private javax.swing.JSlider brightnessSlider;
     private javax.swing.JLabel brightnessSliderText;
@@ -202,9 +198,9 @@ public class DrawFrame extends JFrame
         panel.setLayout(null);
         
         //create buttons
-        undo = new JButton( " Undo" );
-        redo = new JButton( " Redo" );
-        clear = new JButton( " Clear" );
+        undo = new JButton();
+        redo = new JButton();
+        clear = new JButton();
         
         
         importImg = new javax.swing.JLabel();
@@ -212,13 +208,9 @@ public class DrawFrame extends JFrame
         brightnessButtonOK = new JButton("Apply");
         cropButtonOK = new  JButton("Apply");
         contrastButton = new JButton();
-        ovalButton = new JButton();
-        triangleButton = new JButton();
         rotateButton = new JButton();
         cropButton = new JButton();
         textButton = new JButton();
-        zoomPlusButton = new JButton();
-        zoomMinusButton = new JButton();
         drawingButton = new JButton();
         
         brightnessSliderText = new JLabel();
@@ -258,13 +250,9 @@ public class DrawFrame extends JFrame
         brightnessButton.setBorderPainted(false);
 
         contrastButton.setBorderPainted(false);
-        ovalButton.setBorderPainted(false);
-        triangleButton.setBorderPainted(false);
         rotateButton.setBorderPainted(false);
         cropButton.setBorderPainted(false);
         textButton.setBorderPainted(false);
-        zoomPlusButton.setBorderPainted(false);
-        zoomMinusButton.setBorderPainted(false);
         drawingButton.setBorderPainted(false);
                 
         undo.setFocusable(false);
@@ -272,13 +260,9 @@ public class DrawFrame extends JFrame
         clear.setFocusable(false);
         brightnessButton.setFocusable(false);
         contrastButton.setFocusable(false);
-        ovalButton.setFocusable(false);
-        triangleButton.setFocusable(false);
         rotateButton.setFocusable(false);
         cropButton.setFocusable(false);
         textButton.setFocusable(false);
-        zoomPlusButton.setFocusable(false);
-        zoomMinusButton.setFocusable(false);
         drawingButton.setFocusable(false);
         
         
@@ -430,10 +414,6 @@ public class DrawFrame extends JFrame
         brightnessButton.setToolTipText("Brightness: Set brightness of image");
         widgetJPanel.add( contrastButton );
         contrastButton.setToolTipText("Contrast: Set contrast of image");
-        widgetJPanel.add( triangleButton );
-        triangleButton.setToolTipText("Triangle: Draw triangle for minutiae points");
-        widgetJPanel.add( ovalButton );
-        ovalButton.setToolTipText("Ellipse: Draw ellipse for minutiae points");
         widgetJPanel.add( drawingButton );
         drawingButton.setToolTipText("Pen: Draw lines for minutiae points or papillary lines");
         widgetJPanel.add( rotateButton );
@@ -442,11 +422,6 @@ public class DrawFrame extends JFrame
         cropButton.setToolTipText("Crop: Crop image");
         widgetJPanel.add( textButton );
         textButton.setToolTipText("Notes: Add notes to the image");
-        widgetJPanel.add( zoomPlusButton );
-        zoomPlusButton.setToolTipText("Zoom In: Adjust zoom level");
-        widgetJPanel.add( zoomMinusButton );
-        zoomMinusButton.setToolTipText("Zoom Out: Adjust zoom level");
-        
         
         widgetJPanel.add ( brightnessSliderText );       
         widgetJPanel.add( brightnessSlider );
@@ -513,8 +488,11 @@ public class DrawFrame extends JFrame
         
         // create new ButtonHandler for button event handling
         ButtonHandler buttonHandler = new ButtonHandler();
+        undo.setIcon(new ImageIcon(getClass().getResource("/resources/undo.png")));
         undo.addActionListener( buttonHandler );
+        redo.setIcon(new ImageIcon(getClass().getResource("/resources/redo.png")));
         redo.addActionListener( buttonHandler );
+        clear.setIcon(new ImageIcon(getClass().getResource("/resources/clear.png")));
         clear.addActionListener( buttonHandler );
         
         //create handlers for combobox and checkbox
@@ -552,21 +530,6 @@ public class DrawFrame extends JFrame
             }
         });
         
-        ovalButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantEllipse.png")));
-        ovalButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                panel.setTextBoxesInvisible();
-                ovalButtonActionPerformed(evt);
-            }
-        });
-        
-        triangleButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantTriangle.png")));
-        triangleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                panel.setTextBoxesInvisible();
-                triangleButtonActionPerformed(evt);
-            }
-        });
                 
         drawingButton.setIcon(new ImageIcon(getClass().getResource("/resources/markantLine.png")));
         drawingButton.addActionListener(new java.awt.event.ActionListener() {
@@ -600,21 +563,6 @@ public class DrawFrame extends JFrame
             }
         });
         
-        zoomPlusButton.setIcon(new ImageIcon(getClass().getResource("/resources/zoomPlus.PNG")));
-        zoomPlusButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                panel.setTextBoxesInvisible();
-                zoomPlusButtonActionPerformed(evt);
-            }
-        });
-        
-        zoomMinusButton.setIcon(new ImageIcon(getClass().getResource("/resources/zoomMinus.PNG")));
-        zoomMinusButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                panel.setTextBoxesInvisible();
-                zoomMinusButtonActionPerformed(evt);
-            }
-        });
         
         
        brightnessSlider.addChangeListener(new ChangeListener() {
@@ -687,8 +635,8 @@ public class DrawFrame extends JFrame
         });
        
         setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-        setSize( 700, 880 );
-        setMinimumSize(new Dimension(700, 880));
+        setSize( 700, 750 );
+        setMinimumSize(new Dimension(700, 750));
         setVisible( true );
         
     this.addWindowFocusListener(new WindowAdapter() {
@@ -978,7 +926,7 @@ public class DrawFrame extends JFrame
 //            System.out.println(img);       
             File outputfile = new File(jfc.getSelectedFile().getCanonicalPath() + "." + ((FileNameExtensionFilter) jfc.getFileFilter()).getExtensions()[0]);
 //            File outputfile = new File(jfc.getSelectedFile()+"/saved.jpg");
-            ImageIO.write(defaultImg, "jpg", outputfile);
+            ImageIO.write(img, "jpg", outputfile);
         } catch (IOException e) {
             // handle exception
         }        
